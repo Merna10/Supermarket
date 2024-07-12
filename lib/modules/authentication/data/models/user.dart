@@ -1,3 +1,5 @@
+// lib/models/users.dart
+
 class Users {
   final String id;
   final String email;

@@ -1,39 +1,58 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Product {
   final String id;
   final String name;
-  final String description;
-  final String imageUrl;
-  final String availability;
-  final int quantity;
+  final double price;
+  final String category;
+  double quantity;
+  final bool availability;
+  final String productImage;
 
   Product({
     required this.id,
     required this.name,
-    required this.description,
-    required this.imageUrl,
-    required this.availability,
+    required this.price,
+    required this.category,
     required this.quantity,
+    required this.availability,
+    required this.productImage,
   });
 
-  factory Product.fromJson(Map<String, dynamic> json) {
+  factory Product.fromFirestore(DocumentSnapshot doc) {
+    Map data = doc.data() as Map;
     return Product(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      description: json['description'] ?? '',
-      imageUrl: json['imageUrl'] ?? '',
-      availability: json['availability'] ?? '',
-      quantity: json['quantity']?.toInt() ?? 0,
+      id: doc.id,
+      name: data['name'] ?? '',
+      price: data['price'].toDouble() ?? 0.0,
+      category: data['category'] ?? '',
+      quantity: data['quantity'].toDouble() ?? 0.0,
+      availability: data['availability'] ?? false,
+      productImage: data['productImage'] ?? '',
     );
   }
 
-  Map<String, dynamic> toJson() {
+  factory Product.fromMap(Map<String, dynamic> data) {
+    return Product(
+      id: data['id'] ?? '',
+      name: data['name'] ?? '',
+      price: data['price'].toDouble() ?? 0.0,
+      category: data['category'] ?? '',
+      quantity: data['quantity'].toDouble() ?? 0.0,
+      availability: data['availability'] ?? false,
+      productImage: data['productImage'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'name': name,
-      'description': description,
-      'imageUrl': imageUrl,
-      'availability': availability,
+      'price': price,
+      'category': category,
       'quantity': quantity,
+      'availability': availability,
+      'productImage': productImage,
     };
   }
 }

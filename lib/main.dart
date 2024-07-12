@@ -1,8 +1,18 @@
+// lib/main.dart
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:market/modules/authentication/presentation/view/login_view.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:market/modules/home/presentation/view/home_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:market/app/theme/app_theme.dart';
+import 'package:market/modules/authentication/data/repositories/authentication_repository.dart';
+import 'package:market/modules/authentication/logic/bloc/auth_bloc.dart';
+import 'package:market/modules/authentication/presentation/screens/login_screen.dart';
+import 'package:market/modules/cart/data/repositories/cart_repository.dart';
+import 'package:market/modules/cart/logic/bloc/order_bloc.dart';
+import 'package:market/modules/categories/data/repositories/category_repository.dart';
+import 'package:market/modules/categories/logic/bloc/category_bloc.dart';
+import 'package:market/modules/home/presentation/screens/home_screen.dart';
+import 'package:market/modules/products/data/repositories/product_repository.dart';
+import 'package:market/modules/products/logic/bloc/product_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,37 +20,35 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    
-    print('user ${FirebaseAuth.instance.currentUser}');
-  }
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Market App',
-      
-      home: StreamBuilder<User?>(
-        
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          } else if (snapshot.hasData) {
-            return  HomeScreen();
-          } else {
-            return const LoginScreen();
-          }
+    final String userId = "byYx0b3MJ5IGNHToI5Ws"; // replace with actual user ID
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(authRepository: AuthRepository())
+            ..add(AuthCheckStatusEvent()),
+        ),
+        BlocProvider<CategoryBloc>(
+          create: (context) =>
+              CategoryBloc(categoryRepository: CategoryRepository()),
+        ),
+        BlocProvider<ProductBloc>(
+          create: (context) =>
+              ProductBloc(productRepository: ProductRepository()),
+        ),
+        BlocProvider<OrderBloc>(
+          create: (context) => OrderBloc(orderRepository: OrderRepository()),
+        ),
+      ],
+      child: MaterialApp(
+        theme: AppTheme.lightTheme,
+        routes: {
+          '/': (context) => LoginScreen(),
+          '/home': (context) => const HomeScreen(),
         },
       ),
     );

@@ -1,46 +1,24 @@
+// lib/repositories/auth_repository.dart
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:market/modules/authentication/data/models/user.dart';
+import 'package:market/modules/authentication/data/services/auth_service.dart';
 
-class AuthenticationRepository {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+class AuthRepository {
+  final AuthService _authService;
 
-  Future<Users?> loginUser(String email, String password) async {
-    try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      User? user = userCredential.user;
-      return Users(id: user?.uid ?? '', email: user?.email ?? '', userName: user?.displayName ?? '');
-    } catch (e) {
-      // Handle login error
-      print('Login error: $e');
-      return null;
-    }
+  AuthRepository({AuthService? authService})
+      : _authService = authService ?? AuthService();
+
+  Future<User?> signUp(String email, String password) {
+    return _authService.signUp(email, password);
   }
 
-  Future<void> registerUser(String userName, String email, String password) async {
-    try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      await userCredential.user!.updateDisplayName(userName);
-      // Registration successful, userCredential contains user information
-      print('User registered: ${userCredential.user?.email}');
-    } catch (e) {
-      // Handle registration error
-      print('Registration error: $e');
-    }
+  Future<User?> login(String email, String password) {
+    return _authService.login(email, password);
   }
 
-  Future<void> logoutUser() async {
-    try {
-      await _auth.signOut();
-      // Logout successful
-    } catch (e) {
-      // Handle logout error
-      print('Logout error: $e');
-    }
+  Future<void> logout() {
+    return _authService.logout();
   }
+
+  Stream<User?> get user => _authService.user;
 }

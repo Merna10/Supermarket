@@ -1,36 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/product.dart';
+// lib/repositories/product_repository.dart
+
+import 'package:market/modules/products/data/models/product.dart';
+import 'package:market/modules/products/data/services/product_service.dart';
 
 class ProductRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final ProductService _productService;
 
-  Future<List<Product>> fetchProductsByCategory(String categoryId) async {
-    List<Product> products = [];
+  ProductRepository({ProductService? productService})
+      : _productService = productService ?? ProductService();
 
-    try {
-      QuerySnapshot querySnapshot =
-          await _firestore.collection('categories/$categoryId/products').get();
-
-      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-        products.add(Product.fromJson(doc.data() as Map<String, dynamic>));
-      }
-    } catch (e) {
-      print(e);
-    }
-
-    return products;
-  }
-
-  Future<Product?> fetchProductById(String productId) async {
-    try {
-      DocumentSnapshot doc =
-          await _firestore.collection('products').doc(productId).get();
-      if (doc.exists && doc.data() != null) {
-        return Product.fromJson(doc.data() as Map<String, dynamic>);
-      }
-    } catch (e) {
-      print(e);
-    }
-    return null;
+  Future<List<Product>> fetchProductsByCategory(String category) {
+    return _productService.fetchProductsByCategory(category);
   }
 }
