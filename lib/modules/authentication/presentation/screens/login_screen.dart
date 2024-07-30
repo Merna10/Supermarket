@@ -1,11 +1,12 @@
-// lib/screens/login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:market/modules/authentication/logic/bloc/auth_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen>  createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -16,13 +17,12 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
-            ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(state.error)));
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.error)));
           } else if (state is AuthAuthenticated) {
             Navigator.pushReplacementNamed(context, '/home');
           }
@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             if (state is AuthLoading) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: const CircularProgressIndicator());
             }
             return Padding(
               padding: const EdgeInsets.all(16.0),
@@ -38,14 +38,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   TextField(
                     controller: _emailController,
-                    decoration: InputDecoration(labelText: 'Email'),
+                    decoration: const InputDecoration(labelText: 'Email'),
                   ),
                   TextField(
                     controller: _passwordController,
-                    decoration: InputDecoration(labelText: 'Password'),
+                    decoration: const InputDecoration(labelText: 'Password'),
                     obscureText: true,
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 16.0),
                   ElevatedButton(
                     onPressed: () {
                       context.read<AuthBloc>().add(AuthLoginEvent(
@@ -53,16 +53,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         password: _passwordController.text,
                       ));
                     },
-                    child: Text('Login'),
+                    child: const Text('Login'),
                   ),
-                  ElevatedButton(
+                  TextButton(
                     onPressed: () {
-                      context.read<AuthBloc>().add(AuthSignUpEvent(
-                        email: _emailController.text,
-                        password: _passwordController.text,
-                      ));
+                      Navigator.pushNamed(context, '/signup');
                     },
-                    child: Text('Sign Up'),
+                    child: const Text('Don\'t have an account? Sign up'),
                   ),
                 ],
               ),

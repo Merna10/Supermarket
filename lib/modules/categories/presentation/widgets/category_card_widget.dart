@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:market/core/widgets/scaffold_with_nav_bar.dart';
 import 'package:market/modules/categories/data/models/category.dart';
 import 'package:market/modules/products/presentation/screens/product_screen.dart';
 
@@ -14,9 +16,11 @@ class CategoryCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductScreen(
-              categoryId: category.id,
-              categoryName: category.name,
+            builder: (context) => ScaffoldWithNavBar(
+              child: ProductScreen(
+                categoryId: category.id,
+                categoryName: category.name,
+              ),
             ),
           ),
         );
@@ -35,18 +39,36 @@ class CategoryCard extends StatelessWidget {
                   topLeft: Radius.circular(16.0),
                   topRight: Radius.circular(16.0),
                 ),
-                child: Image.network(
-                  category.imageUrl,
-                  fit: BoxFit.cover,
+                child: Stack(
+                  children: [
+                    Image.network(
+                      category.imageUrl,
+                      fit: BoxFit.cover,
+                      height: double.infinity,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        color: Colors.black
+                            .withOpacity(0.5), // Semi-transparent background
+                        child: Text(
+                          category.name,
+                          style: GoogleFonts.playfairDisplay(
+                            textStyle: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            Text(
-              category.name,
-              style: const TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.w400,
               ),
             ),
           ],

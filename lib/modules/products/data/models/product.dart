@@ -7,7 +7,7 @@ class Product {
   final String category;
   double quantity;
   final bool availability;
-  final String productImage;
+  final List<String> productImage;
 
   Product({
     required this.id,
@@ -28,7 +28,7 @@ class Product {
       category: data['category'] ?? '',
       quantity: data['quantity'].toDouble() ?? 0.0,
       availability: data['availability'] ?? false,
-      productImage: data['productImage'] ?? '',
+      productImage: List<String>.from(data['productImage']),
     );
   }
 
@@ -40,7 +40,7 @@ class Product {
       category: data['category'] ?? '',
       quantity: data['quantity'].toDouble() ?? 0.0,
       availability: data['availability'] ?? false,
-      productImage: data['productImage'] ?? '',
+      productImage: List<String>.from(data['productImage']),
     );
   }
 

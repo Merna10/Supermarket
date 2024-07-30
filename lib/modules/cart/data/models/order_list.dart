@@ -1,8 +1,5 @@
-
-// lib/models/order.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:market/modules/cart/data/models/cart_item_model.dart';
-
 
 class OrderList {
   final String id;
@@ -17,6 +14,16 @@ class OrderList {
     required this.total,
   });
 
+  factory OrderList.fromMap(Map<String, dynamic> map) {
+    return OrderList(
+      id: map['id'] as String,
+      items: (map['items'] as List<dynamic>)
+          .map((item) => OrderItem.fromMap(item as Map<String, dynamic>))
+          .toList(),
+      status: map['status'] as String,
+      total: map['total'] as double,
+    );
+  }
   factory OrderList.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map;
     return OrderList(

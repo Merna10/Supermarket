@@ -1,18 +1,18 @@
-// lib/repositories/order_repository.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:market/modules/cart/data/models/order_list.dart';
-import 'package:market/modules/cart/data/services/cart_service.dart';
 
 class OrderRepository {
-  final OrderService _orderService;
+  final FirebaseFirestore _firestore;
 
-  OrderRepository({OrderService? orderService})
-      : _orderService = orderService ?? OrderService();
+  OrderRepository(this._firestore);
 
-  Future<void> addOrder(OrderList order, String userId) {
-    return _orderService.addOrder(order, userId);
+  Future<void> addOrder(OrderList orderList, String userId) async {
+    final ordersRef = _firestore.collection('users').doc(userId).collection('orders');
+    await ordersRef.add(orderList.toMap());
   }
 
-  Future<List<OrderList>> fetchOrders(String userId) {
-    return _orderService.fetchOrders(userId);
+  Future<List<OrderList>> fetchOrders(String userId) async {
+    final ordersSnapshot = await _firestore.collection('users').doc(userId).collection('orders').get();
+    return ordersSnapshot.docs.map((doc) => OrderList.fromMap(doc.data())).toList();
   }
 }

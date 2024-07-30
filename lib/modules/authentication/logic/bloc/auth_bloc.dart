@@ -1,4 +1,3 @@
-// lib/bloc/auth_bloc.dart
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,7 +21,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   void _onSignUp(AuthSignUpEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      await _authRepository.signUp(event.email, event.password);
+      await _authRepository.signUp(event.email, event.password, event.userName, event.phoneNumber, event.location);
       emit(AuthAuthenticated());
     } catch (e) {
       emit(AuthError(e.toString()));

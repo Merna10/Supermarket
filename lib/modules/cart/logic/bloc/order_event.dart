@@ -1,4 +1,3 @@
-// lib/bloc/order_event.dart
 part of 'order_bloc.dart';
 
 abstract class OrderEvent extends Equatable {
@@ -8,14 +7,34 @@ abstract class OrderEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class LoadCart extends OrderEvent {}
+
 class AddOrderItem extends OrderEvent {
   final OrderItem orderItem;
-  final String userId;
 
-  const AddOrderItem({required this.orderItem, required this.userId});
+  const AddOrderItem({required this.orderItem});
 
   @override
-  List<Object> get props => [orderItem, userId];
+  List<Object> get props => [orderItem];
+}
+
+class RemoveOrderItem extends OrderEvent {
+  final OrderItem orderItem;
+
+  const RemoveOrderItem({required this.orderItem});
+
+  @override
+  List<Object> get props => [orderItem];
+}
+
+class UpdateOrderItemQuantity extends OrderEvent {
+  final OrderItem orderItem;
+  final int quantity;
+
+  const UpdateOrderItemQuantity({required this.orderItem, required this.quantity});
+
+  @override
+  List<Object> get props => [orderItem, quantity];
 }
 
 class SubmitOrder extends OrderEvent {
@@ -31,6 +50,15 @@ class FetchOrders extends OrderEvent {
   final String userId;
 
   const FetchOrders({required this.userId});
+
+  @override
+  List<Object> get props => [userId];
+}
+
+class LoadOrdersOnAppStart extends OrderEvent {
+  final String userId;
+
+  const LoadOrdersOnAppStart({required this.userId});
 
   @override
   List<Object> get props => [userId];

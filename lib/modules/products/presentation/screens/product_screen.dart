@@ -1,8 +1,8 @@
-// lib/screens/product_screen.dart
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:market/modules/cart/presentation/cart_screen.dart';
 import 'package:market/modules/products/data/models/product.dart';
 import 'package:market/modules/products/logic/bloc/product_bloc.dart';
@@ -18,23 +18,36 @@ class ProductScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final userId = user?.uid;
+
     context
         .read<ProductBloc>()
         .add(FetchProductsByCategory(category: categoryId));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('$categoryName Products'),
+        title: Center(
+          child: Text(
+            '$categoryName Products',
+            style: GoogleFonts.playfairDisplay(
+              textStyle: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black),
+            ),
+          ),
+        ),
+        backgroundColor: HexColor('f1efde'),
         actions: [
           IconButton(
-            icon: Icon(Icons.shopping_cart),
+            icon: const Icon(Icons.shopping_cart),
             onPressed: () {
-              if (user != null) {
+              if (userId != null) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => CartScreen(
-                            userId: 'byYx0b3MJ5IGNHToI5Ws',
+                            userId: userId.toString(),
                           )),
                 );
               }
@@ -44,17 +57,15 @@ class ProductScreen extends StatelessWidget {
       ),
       body: BlocBuilder<ProductBloc, ProductState>(
         builder: (context, state) {
-          if (state is ProductInitial) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is ProductLoading) {
+          if (state is ProductInitial || state is ProductLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ProductLoaded) {
             return GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                childAspectRatio: 0.6,
+                crossAxisCount: 1,
+                childAspectRatio: 0.7,
                 crossAxisSpacing: 10.0,
-                mainAxisSpacing: 10.0,
+                mainAxisSpacing: 5.0,
               ),
               itemCount: state.products.length,
               itemBuilder: (context, index) {
@@ -64,7 +75,8 @@ class ProductScreen extends StatelessWidget {
                   productId: product.id,
                   productName: product.name,
                   productImage: product.productImage,
-                  userId: 'byYx0b3MJ5IGNHToI5Ws',
+                  productStatus: product.availability,
+                  userId: userId.toString(),
                 );
               },
             );
