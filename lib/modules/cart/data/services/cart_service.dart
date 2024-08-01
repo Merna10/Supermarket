@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:market/modules/cart/data/models/order_list.dart';
+import 'package:market/shared/models/order_list.dart';
 
 class OrderService {
   final FirebaseFirestore _firestore;
@@ -14,7 +14,6 @@ class OrderService {
       final userId = user?.uid;
 
       if (userId != null) {
-        // Use the correct path: 'users/{userId}/orders'
         await _firestore.collection('users').doc(userId).collection('orders').add(order.toMap());
       } else {
         throw Exception('User not authenticated');
@@ -30,8 +29,7 @@ class OrderService {
       final userId = user?.uid;
 
       if (userId != null) {
-        // Use the correct path: 'users/{userId}/orders'
-        QuerySnapshot snapshot = await _firestore.collection('users').doc(userId).collection('orders').get();
+       QuerySnapshot snapshot = await _firestore.collection('users').doc(userId).collection('orders').get();
         return snapshot.docs.map((doc) => OrderList.fromFirestore(doc)).toList();
       } else {
         throw Exception('User not authenticated');

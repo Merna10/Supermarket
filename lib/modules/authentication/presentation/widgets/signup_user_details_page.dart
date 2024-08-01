@@ -4,7 +4,7 @@ class SignUpUserDetailsPage extends StatelessWidget {
   final TextEditingController userNameController;
   final TextEditingController phoneNumberController;
 
-  SignUpUserDetailsPage({required this.userNameController, required this.phoneNumberController});
+  const SignUpUserDetailsPage({super.key, required this.userNameController, required this.phoneNumberController});
 
   @override
   Widget build(BuildContext context) {
@@ -12,11 +12,11 @@ class SignUpUserDetailsPage extends StatelessWidget {
       children: [
         TextField(
           controller: userNameController,
-          decoration: InputDecoration(labelText: 'Username'),
+          decoration: const InputDecoration(labelText: 'Username'),
         ),
         TextField(
           controller: phoneNumberController,
-          decoration: InputDecoration(labelText: 'Phone Number'),
+          decoration: const InputDecoration(labelText: 'Phone Number'),
         ),
       ],
     );

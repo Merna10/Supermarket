@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:market/modules/authentication/logic/bloc/auth_bloc.dart';
-import 'package:market/modules/authentication/presentation/widgets/signup_address_page.dart';
 import 'package:market/modules/authentication/presentation/widgets/signup_email_page.dart';
 import 'package:market/modules/authentication/presentation/widgets/signup_user_details_page.dart';
 
@@ -25,9 +24,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   int _currentPage = 0;
 
   void _nextPage() {
-    if (_currentPage < 2) {
+    if (_currentPage < 1) {
       _pageController.nextPage(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
       setState(() {
@@ -39,7 +38,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void _previousPage() {
     if (_currentPage > 0) {
       _pageController.previousPage(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
       setState(() {
@@ -67,7 +66,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign Up'),
+        title: const Text('Sign Up'),
       ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
@@ -79,7 +78,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         },
         child: PageView(
           controller: _pageController,
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           children: [
             SignUpEmailPage(
                 emailController: _emailController,
@@ -87,11 +86,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             SignUpUserDetailsPage(
                 userNameController: _userNameController,
                 phoneNumberController: _phoneNumberController),
-            SignUpAddressPage(
-              cityController: _cityController,
-              streetController: _streetController,
-              apartmentController: _apartmentController,
-            ),
+          
           ],
         ),
       ),
@@ -103,11 +98,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
             if (_currentPage > 0)
               ElevatedButton(
                 onPressed: _previousPage,
-                child: Text('Previous'),
+                child: const Text('Previous'),
               ),
             ElevatedButton(
-              onPressed: _currentPage == 2 ? _completeSignUp : _nextPage,
-              child: Text(_currentPage == 2 ? 'Complete Sign Up' : 'Next'),
+              onPressed: _currentPage == 1 ? _completeSignUp : _nextPage,
+              child: Text(_currentPage == 1 ? 'Complete Sign Up' : 'Next'),
             ),
           ],
         ),

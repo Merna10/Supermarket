@@ -1,9 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:market/modules/cart/presentation/cart_screen.dart';
+import 'package:market/app/theme/text_styles.dart';
 import 'package:market/modules/products/data/models/product.dart';
 import 'package:market/modules/products/logic/bloc/product_bloc.dart';
 import 'package:market/modules/products/presentation/widgets/product_card_widget.dart';
@@ -26,34 +25,14 @@ class ProductScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Center(
           child: Text(
             '$categoryName Products',
-            style: GoogleFonts.playfairDisplay(
-              textStyle: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black),
-            ),
+            style: AppTextStyles.textTheme.headlineMedium,
           ),
         ),
         backgroundColor: HexColor('f1efde'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              if (userId != null) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => CartScreen(
-                            userId: userId.toString(),
-                          )),
-                );
-              }
-            },
-          ),
-        ],
       ),
       body: BlocBuilder<ProductBloc, ProductState>(
         builder: (context, state) {

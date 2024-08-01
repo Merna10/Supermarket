@@ -11,7 +11,7 @@ class HiveService {
   }
 
   Future<void> addItemToCart(OrderItem orderItem) async {
-    var box = await Hive.openBox<OrderItem>('cart');
+    var box = await Hive.openBox<OrderItem>('order');
     final existingItemIndex = box.values.toList().indexWhere(
           (item) => item.productId == orderItem.productId,
         );
@@ -30,7 +30,7 @@ class HiveService {
   }
 
   Future<void> removeItemFromCart(OrderItem orderItem) async {
-    var box = await Hive.openBox<OrderItem>('cart');
+    var box = await Hive.openBox<OrderItem>('order');
     final existingItemIndex = box.values.toList().indexWhere(
           (item) => item.productId == orderItem.productId,
         );
@@ -41,8 +41,9 @@ class HiveService {
     }
   }
 
-  Future<void> updateItemQuantityInCart(OrderItem orderItem, int quantity) async {
-    var box = await Hive.openBox<OrderItem>('cart');
+  Future<void> updateItemQuantityInCart(
+      OrderItem orderItem, int quantity) async {
+    var box = await Hive.openBox<OrderItem>('order');
     final existingItemIndex = box.values.toList().indexWhere(
           (item) => item.productId == orderItem.productId,
         );
@@ -56,13 +57,13 @@ class HiveService {
   }
 
   Future<List<OrderItem>> getCartItems() async {
-    var box = await Hive.openBox<OrderItem>('cart');
+    var box = await Hive.openBox<OrderItem>('order');
     print('Retrieved cart items: ${box.values.toList()}');
     return box.values.toList();
   }
 
   Future<void> clearCart() async {
-    var box = await Hive.openBox<OrderItem>('cart');
+    var box = await Hive.openBox<OrderItem>('order');
     await box.clear();
     print('Cleared cart');
   }

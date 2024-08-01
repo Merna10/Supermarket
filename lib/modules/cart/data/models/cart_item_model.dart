@@ -17,29 +17,35 @@ class OrderItem {
   @HiveField(3)
   final double price;
 
+  @HiveField(4)
+  final String productImage;
+
   OrderItem({
     required this.productId,
     required this.productName,
     required this.quantity,
     required this.price,
+    required this.productImage,
   });
 
   factory OrderItem.fromFirestore(DocumentSnapshot doc) {
-    Map data = doc.data() as Map<String, dynamic>;
+    final data = doc.data() as Map<String, dynamic>;
     return OrderItem(
       productId: doc.id,
-      productName: data['productName'] ?? '',
-      quantity: data['quantity'] ?? 0,
-      price: data['price'] ?? 0.0,
+      productName: data['productName'] as String? ?? '',
+      quantity: data['quantity'] as int? ?? 0,
+      price: data['price'] as double? ?? 0.0,
+      productImage: data['productImage'] as String? ?? '',
     );
   }
 
   factory OrderItem.fromMap(Map<String, dynamic> map) {
     return OrderItem(
-      productId: map['productId'] as String,
-      productName: map['productName'] as String,
-      quantity: map['quantity'] as int,
-      price: map['price'] as double,
+      productId: map['productId'] as String? ?? '',
+      productName: map['productName'] as String? ?? '',
+      quantity: map['quantity'] as int? ?? 0,
+      price: map['price'] as double? ?? 0.0,
+      productImage: map['productImage'] as String? ?? '',
     );
   }
 
@@ -49,6 +55,7 @@ class OrderItem {
       'productName': productName,
       'quantity': quantity,
       'price': price,
+      'productImage': productImage,
     };
   }
 
@@ -57,12 +64,14 @@ class OrderItem {
     String? productName,
     int? quantity,
     double? price,
+    String? productImage,
   }) {
     return OrderItem(
       productId: productId ?? this.productId,
       productName: productName ?? this.productName,
       quantity: quantity ?? this.quantity,
       price: price ?? this.price,
+      productImage: productImage ?? this.productImage,
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:market/modules/cart/data/models/order_list.dart';
+import 'package:market/shared/models/order_list.dart';
 
 class OrderRepository {
   final FirebaseFirestore _firestore;

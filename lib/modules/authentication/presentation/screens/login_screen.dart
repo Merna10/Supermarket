@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             if (state is AuthLoading) {
-              return const Center(child: const CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
             return Padding(
               padding: const EdgeInsets.all(16.0),

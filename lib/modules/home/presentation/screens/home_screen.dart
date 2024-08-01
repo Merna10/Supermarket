@@ -1,10 +1,8 @@
-// lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:market/modules/authentication/logic/bloc/auth_bloc.dart';
-import 'package:market/modules/categories/presentation/screens/category_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -49,6 +47,13 @@ class HomeScreen extends StatelessWidget {
                     title: const Text('Home'),
                     onTap: () {
                       Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.history),
+                    title: const Text('Your Orders'),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/history');
                     },
                   ),
                   ListTile(
@@ -120,6 +125,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
+            
           ],
         ),
       ),

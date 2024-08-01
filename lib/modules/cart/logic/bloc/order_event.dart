@@ -31,7 +31,8 @@ class UpdateOrderItemQuantity extends OrderEvent {
   final OrderItem orderItem;
   final int quantity;
 
-  const UpdateOrderItemQuantity({required this.orderItem, required this.quantity});
+  const UpdateOrderItemQuantity(
+      {required this.orderItem, required this.quantity});
 
   @override
   List<Object> get props => [orderItem, quantity];
@@ -39,8 +40,13 @@ class UpdateOrderItemQuantity extends OrderEvent {
 
 class SubmitOrder extends OrderEvent {
   final String userId;
-
-  const SubmitOrder({required this.userId});
+  final String deliveryAddress;
+  final double deliveryFees;
+  const SubmitOrder({
+    required this.userId,
+    required this.deliveryAddress,
+    required this.deliveryFees,
+  });
 
   @override
   List<Object> get props => [userId];

@@ -1,4 +1,3 @@
-// lib/bloc/category_bloc.dart
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:market/modules/categories/data/models/category.dart';

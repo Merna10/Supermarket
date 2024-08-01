@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:market/app/theme/text_styles.dart';
 import 'package:market/modules/cart/data/models/cart_item_model.dart';
 import 'package:market/modules/cart/logic/bloc/order_bloc.dart';
 import 'package:hive/hive.dart';
@@ -34,6 +33,7 @@ class ProductCard extends StatefulWidget {
 class _ProductCardState extends State<ProductCard> {
   int quantity = 0;
   int _currentImageIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -41,20 +41,27 @@ class _ProductCardState extends State<ProductCard> {
   }
 
   Future<void> _loadQuantity() async {
-    var box = await Hive.openBox<OrderItem>('cart');
-    final existingItem = box.values.firstWhere(
-      (item) => item.productId == widget.productId,
-      orElse: () => OrderItem(
-        productId: widget.productId,
-        productName: widget.productName,
-        quantity: 0,
-        price: widget.price,
-      ),
-    );
+    try {
+      var box = await Hive.openBox<OrderItem>('order');
+      final existingItem = box.values.firstWhere(
+        (item) => item.productId == widget.productId,
+        orElse: () => OrderItem(
+          productId: widget.productId,
+          productName: widget.productName,
+          quantity: 0,
+          price: widget.price,
+          productImage:
+              widget.productImage.isNotEmpty ? widget.productImage.first : '',
+        ),
+      );
 
-    setState(() {
-      quantity = existingItem.quantity;
-    });
+      setState(() {
+        quantity = existingItem.quantity;
+      });
+    } catch (e) {
+      // Handle errors
+      print('Error loading quantity: $e');
+    }
   }
 
   void _incrementQuantity() {
@@ -79,9 +86,10 @@ class _ProductCardState extends State<ProductCard> {
       productName: widget.productName,
       quantity: quantity,
       price: widget.price,
+      productImage:
+          widget.productImage.isNotEmpty ? widget.productImage.first : '',
     );
     BlocProvider.of<OrderBloc>(context).add(AddOrderItem(orderItem: orderItem));
-
     BlocProvider.of<OrderBloc>(context).add(UpdateOrderItemQuantity(
       orderItem: orderItem,
       quantity: quantity,
@@ -138,31 +146,34 @@ class _ProductCardState extends State<ProductCard> {
                   widget.productName,
                   style: GoogleFonts.playfairDisplay(
                     textStyle: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black),
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${widget.price.toStringAsFixed(2)}LE',
+                  '${widget.price.toStringAsFixed(2)} LE',
                   style: GoogleFonts.roboto(
                     textStyle: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.black),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
                 if (!widget.productStatus)
                   Center(
                     child: Text(
-                      'Out Stock',
+                      'Out of Stock',
                       style: GoogleFonts.roboto(
                         textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w300,
-                            color: Color.fromARGB(255, 211, 17, 17)),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w300,
+                          color: Color.fromARGB(255, 211, 17, 17),
+                        ),
                       ),
                     ),
                   ),
@@ -181,9 +192,10 @@ class _ProductCardState extends State<ProductCard> {
                         'Add to Cart',
                         style: GoogleFonts.playfairDisplay(
                           textStyle: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.black),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
@@ -208,14 +220,13 @@ class _ProductCardState extends State<ProductCard> {
                         '$quantity',
                         style: GoogleFonts.roboto(
                           textStyle: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black),
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
-                      const SizedBox(
-                        width: 6,
-                      ),
+                      const SizedBox(width: 6),
                       Container(
                         decoration: BoxDecoration(
                           color: HexColor('f1efde'),
@@ -226,7 +237,7 @@ class _ProductCardState extends State<ProductCard> {
                           icon: const Icon(Icons.add),
                           color: Colors.white,
                         ),
-                      )
+                      ),
                     ],
                   ),
               ],

@@ -1,79 +1,67 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTextStyles {
-  static const TextTheme textTheme = TextTheme(
-    displayLarge: TextStyle(
-      fontFamily: 'Roboto',
+  static TextTheme textTheme = TextTheme(
+    displayLarge: GoogleFonts.playfairDisplay(
       fontSize: 96.0,
       fontWeight: FontWeight.bold,
       letterSpacing: -1.5,
     ),
-    displayMedium: TextStyle(
-      fontFamily: 'Roboto',
+    displayMedium: GoogleFonts.playfairDisplay(
       fontSize: 60.0,
       fontWeight: FontWeight.bold,
       letterSpacing: -0.5,
     ),
-    displaySmall: TextStyle(
-      fontFamily: 'Roboto',
-      fontSize: 48.0,
+    displaySmall: GoogleFonts.playfairDisplay(
+      fontSize: 25.0,
       fontWeight: FontWeight.normal,
     ),
-    headlineMedium: TextStyle(
-      fontFamily: 'Roboto',
+    headlineMedium: GoogleFonts.playfairDisplay(
       fontSize: 34.0,
       fontWeight: FontWeight.bold,
       letterSpacing: 0.25,
     ),
-    headlineSmall: TextStyle(
-      fontFamily: 'Roboto',
+    headlineSmall: GoogleFonts.playfairDisplay(
       fontSize: 24.0,
       fontWeight: FontWeight.bold,
     ),
-    titleLarge: TextStyle(
-      fontFamily: 'Roboto',
+    titleLarge: GoogleFonts.playfairDisplay(
       fontSize: 20.0,
       fontWeight: FontWeight.bold,
       letterSpacing: 0.15,
     ),
-    titleMedium: TextStyle(
-      fontFamily: 'Roboto',
+    titleMedium: GoogleFonts.playfairDisplay(
       fontSize: 16.0,
       fontWeight: FontWeight.normal,
       letterSpacing: 0.15,
     ),
-    titleSmall: TextStyle(
-      fontFamily: 'Roboto',
+    titleSmall: GoogleFonts.playfairDisplay(
       fontSize: 14.0,
       fontWeight: FontWeight.normal,
       letterSpacing: 0.1,
     ),
-    bodyLarge: TextStyle(
+    bodyLarge: const TextStyle(
       fontFamily: 'Roboto',
       fontSize: 16.0,
       fontWeight: FontWeight.normal,
       letterSpacing: 0.5,
     ),
-    bodyMedium: TextStyle(
-      fontFamily: 'Roboto',
+    bodyMedium: GoogleFonts.playfairDisplay(
       fontSize: 14.0,
       fontWeight: FontWeight.normal,
       letterSpacing: 0.25,
     ),
-    labelLarge: TextStyle(
-      fontFamily: 'Roboto',
+    labelLarge: GoogleFonts.playfairDisplay(
       fontSize: 14.0,
       fontWeight: FontWeight.bold,
       letterSpacing: 1.25,
     ),
-    bodySmall: TextStyle(
-      fontFamily: 'Roboto',
+    bodySmall: GoogleFonts.playfairDisplay(
       fontSize: 12.0,
-      fontWeight: FontWeight.normal,
-      letterSpacing: 0.4,
+      fontWeight: FontWeight.w300,
     ),
-    labelSmall: TextStyle(
-      fontFamily: 'Roboto',
+    labelSmall: GoogleFonts.playfairDisplay(
       fontSize: 10.0,
       fontWeight: FontWeight.normal,
       letterSpacing: 1.5,

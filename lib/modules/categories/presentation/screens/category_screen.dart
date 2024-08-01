@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:market/app/theme/colors.dart'; // Assuming this imports your custom colors
-import 'package:market/modules/cart/presentation/cart_screen.dart';
+// Assuming this imports your custom colors
+import 'package:market/app/theme/text_styles.dart';
 import 'package:market/modules/categories/data/models/category.dart';
 import 'package:market/modules/categories/logic/bloc/category_bloc.dart';
 import 'package:market/modules/categories/presentation/widgets/category_card_widget.dart';
-import 'package:market/modules/products/presentation/screens/product_screen.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
@@ -25,12 +23,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         title: Center(
           child: Text(
             'Categories',
-            style: GoogleFonts.playfairDisplay(
-              textStyle: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black),
-            ),
+            style: AppTextStyles.textTheme.headlineMedium,
           ),
         ),
         backgroundColor: HexColor('f1efde'),

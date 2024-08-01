@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:market/core/widgets/scaffold_with_nav_bar.dart';
+import 'package:market/shared/widgets/scaffold_with_nav_bar.dart';
 import 'package:market/modules/categories/data/models/category.dart';
 import 'package:market/modules/products/presentation/screens/product_screen.dart';
 

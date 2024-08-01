@@ -1,5 +1,3 @@
-// lib/repositories/product_repository.dart
-
 import 'package:market/modules/products/data/models/product.dart';
 import 'package:market/modules/products/data/services/product_service.dart';
 

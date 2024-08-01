@@ -23,7 +23,6 @@ class AuthService {
           email: email,
           userName: userName,
           phoneNumber: phoneNumber,
-          location: location,
         );
         await _firestore.collection('users').doc(user.uid).set(newUser.toMap());
       }

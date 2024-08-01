@@ -1,5 +1,3 @@
-// lib/repositories/category_repository.dart
-
 import 'package:market/modules/categories/data/models/category.dart';
 import 'package:market/modules/categories/data/services/category_service.dart';
 
