@@ -9,8 +9,8 @@ part 'history_state.dart';
 class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
   final HistoryRepository _historyRepository;
 
-  HistoryBloc({required HistoryRepository HistoryRepository})
-      : _historyRepository = HistoryRepository,
+  HistoryBloc({required HistoryRepository historyRepository})
+      : _historyRepository = historyRepository,
         super(HistoryInitial()) {
     on<FetchOrders>(_onFetchOrders);
   }

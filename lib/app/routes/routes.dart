@@ -25,7 +25,7 @@ class AppRoutes {
       signup: (context) => const SignUpScreen(),
       home: (context) => const ScaffoldWithNavBar(child: HomeScreen()),
       history: (context) => const ScaffoldWithNavBar(child: HistoryScreen()),
-      cart: (context) => CartScreen(userId: userId),
+      cart: (context) => const CartScreen(),
       categories: (context) => const ScaffoldWithNavBar(child: CategoryScreen()),
     };
   }

@@ -49,24 +49,26 @@ class _ImageGridState extends State<ImageGrid> {
       },
       child: Stack(
         children: [
-          PageView.builder(
-            itemCount: widget.imageUrls.length,
-            itemBuilder: (context, index) {
-              return Image.network(
-                widget.imageUrls[index],
-                fit: BoxFit.fitWidth,
-              );
-            },
-            controller: _pageController,
-            onPageChanged: (index) {
-              _currentPageNotifier.value = index;
-            },
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: PageView.builder(
+              itemCount: widget.imageUrls.length,
+              itemBuilder: (context, index) {
+                return Image.network(
+                  widget.imageUrls[index],
+                  fit: BoxFit.fitWidth,
+                );
+              },
+              controller: _pageController,
+              onPageChanged: (index) {
+                _currentPageNotifier.value = index;
+              },
+            ),
           ),
           if (widget.imageUrls.length > 1)
             Positioned(
               left: 8.0,
-              top: MediaQuery.of(context).size.height * 0.222 -
-                  20, // Center vertically
+              top: MediaQuery.of(context).size.height * 0.222 - 20,
               child: ValueListenableBuilder(
                 valueListenable: _currentPageNotifier,
                 builder: (context, currentIndex, _) {
@@ -91,8 +93,7 @@ class _ImageGridState extends State<ImageGrid> {
             ),
           Positioned(
             right: 8.0,
-            top: MediaQuery.of(context).size.height * 0.222 -
-                20, // Center vertically
+            top: MediaQuery.of(context).size.height * 0.222 - 20,
             child: ValueListenableBuilder(
               valueListenable: _currentPageNotifier,
               builder: (context, currentIndex, _) {

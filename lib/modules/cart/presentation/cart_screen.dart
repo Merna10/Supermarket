@@ -6,14 +6,13 @@ import 'package:market/app/theme/text_styles.dart';
 import 'package:market/core/services/location_service.dart';
 import 'package:market/core/utils/delivery_fee_util.dart';
 import 'package:market/modules/cart/logic/bloc/order_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 const double storeLat = 30.020760;
-const double storeLon = 31.395011; 
+const double storeLon = 31.395011;
 
 class CartScreen extends StatefulWidget {
-  final String userId;
-
-  const CartScreen({super.key, required this.userId});
+  const CartScreen({super.key});
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -94,6 +93,19 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
+  Future<void> _handleCheckout() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      Navigator.pushNamed(context, '/');
+    } else {
+      context.read<OrderBloc>().add(SubmitOrder(
+            userId: user.uid,
+            deliveryAddress: _deliveryAddress,
+            deliveryFees: _deliveryFee,
+          ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,7 +122,10 @@ class _CartScreenState extends State<CartScreen> {
       body: BlocBuilder<OrderBloc, OrderState>(
         builder: (context, state) {
           if (state is OrderLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+                child: CircularProgressIndicator(
+              color: HexColor('f1efde'),
+            ));
           } else if (state is CartLoaded) {
             if (state.cartItems.items.isEmpty) {
               return Column(
@@ -238,13 +253,7 @@ class _CartScreenState extends State<CartScreen> {
                   Column(
                     children: [
                       TextButton(
-                        onPressed: () {
-                          context.read<OrderBloc>().add(SubmitOrder(
-                                userId: widget.userId,
-                                deliveryAddress: _deliveryAddress,
-                                deliveryFees: _deliveryFee,
-                              ));
-                        },
+                        onPressed: _handleCheckout,
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.white,
                           backgroundColor:
@@ -258,7 +267,7 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                       ),
                       Text(
-                        '+${_deliveryFee.toStringAsFixed(2)} deleviry fees',
+                        '+${_deliveryFee.toStringAsFixed(2)} delivery fees',
                         style: AppTextStyles.textTheme.bodySmall,
                       ),
                     ],

@@ -6,6 +6,7 @@ import 'package:market/app/theme/text_styles.dart';
 import 'package:market/modules/products/data/models/product.dart';
 import 'package:market/modules/products/logic/bloc/product_bloc.dart';
 import 'package:market/modules/products/presentation/widgets/product_card_widget.dart';
+import 'package:market/modules/products/presentation/screens/product_details_screen.dart';
 
 class ProductScreen extends StatelessWidget {
   final String categoryId;
@@ -37,12 +38,14 @@ class ProductScreen extends StatelessWidget {
       body: BlocBuilder<ProductBloc, ProductState>(
         builder: (context, state) {
           if (state is ProductInitial || state is ProductLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+                child: CircularProgressIndicator(
+              color: HexColor('f1efde'),
+            ));
           } else if (state is ProductLoaded) {
             return GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,
-                childAspectRatio: 0.7,
+                crossAxisCount: 1, childAspectRatio: 0.7,
                 crossAxisSpacing: 10.0,
                 mainAxisSpacing: 5.0,
               ),
@@ -50,12 +53,7 @@ class ProductScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 Product product = state.products[index];
                 return ProductCard(
-                  price: product.price,
-                  productId: product.id,
-                  productName: product.name,
-                  productImage: product.productImage,
-                  productStatus: product.availability,
-                  userId: userId.toString(),
+                  product: product,
                 );
               },
             );

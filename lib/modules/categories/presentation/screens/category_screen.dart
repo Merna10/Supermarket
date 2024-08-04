@@ -34,7 +34,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
             context.read<CategoryBloc>().add(FetchCategories());
             return const Center(child: CircularProgressIndicator());
           } else if (state is CategoryLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+                child: CircularProgressIndicator(
+              color: HexColor('f1efde'),
+            ));
           } else if (state is CategoryLoaded) {
             return GridView.count(
               crossAxisCount: 2,

@@ -31,7 +31,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
         builder: (context, state) {
           if (state is HistoryInitial) {
             context.read<HistoryBloc>().add(FetchOrders());
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+                child: CircularProgressIndicator(
+              color: HexColor('f1efde'),
+            ));
           } else if (state is HistoryLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is HistoryLoaded) {

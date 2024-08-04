@@ -39,3 +39,4 @@ class CartLoaded extends OrderState {
 }
 
 class OrderSubmitted extends OrderState {}
+class LogoutSuccess extends OrderState {}

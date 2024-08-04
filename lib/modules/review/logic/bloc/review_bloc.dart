@@ -14,11 +14,14 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     on<FetchReviewsEvent>(_onFetchReviews);
   }
 
-  void _onAddReview(AddReviewEvent event, Emitter<ReviewState> emit) async {
+  Future<void> _onAddReview(
+      AddReviewEvent event, Emitter<ReviewState> emit) async {
     try {
       print('Adding review');
       await _reviewRepository.addReview(event.review);
+
       emit(ReviewAdded());
+      add(FetchReviewsEvent());
       print('Review added');
     } catch (e) {
       emit(ReviewError(e.toString()));
@@ -26,15 +29,16 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     }
   }
 
-  void _onFetchReviews(FetchReviewsEvent event, Emitter<ReviewState> emit) {
+  Future<void> _onFetchReviews(
+      FetchReviewsEvent event, Emitter<ReviewState> emit) async {
     emit(ReviewsLoading());
     print('Fetching reviews');
-    _reviewRepository.getReviews().listen((reviews) {
+    await _reviewRepository.getReviews().listen((reviews) {
       print('Reviews fetched: ${reviews.length}');
       emit(ReviewsLoaded(reviews));
     }, onError: (e) {
       emit(ReviewError(e.toString()));
       print('Error fetching reviews: ${e.toString()}');
-    });
+    }).asFuture();
   }
 }

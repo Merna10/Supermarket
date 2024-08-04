@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:market/core/services/location_service.dart';
 import 'package:market/core/utils/delivery_fee_util.dart';
@@ -7,6 +8,7 @@ import 'package:market/modules/cart/data/models/cart_item_model.dart';
 import 'package:market/shared/models/order_list.dart';
 import 'package:market/modules/cart/data/repositories/cart_repository.dart';
 import 'package:market/modules/cart/data/services/hive_services.dart';
+import 'package:market/modules/authentication/logic/bloc/auth_bloc.dart';
 
 part 'order_event.dart';
 part 'order_state.dart';
@@ -26,17 +28,30 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
         super(OrderInitial()) {
     on<AddOrderItem>(_onAddOrderItem);
     on<SubmitOrder>(_onSubmitOrder);
-    on<FetchOrders>(_onFetchOrders);
     on<LoadCart>(_onLoadCart);
     on<RemoveOrderItem>(_onRemoveOrderItem);
     on<UpdateOrderItemQuantity>(_onUpdateOrderItemQuantity);
     on<LoadOrdersOnAppStart>(_onLoadOrdersOnAppStart);
+    on<Logout>(_onLogout);
+  }
+
+  Future<bool> _isUserLoggedIn() async {
+    final user = FirebaseAuth.instance.currentUser;
+    return user != null;
   }
 
   void _onAddOrderItem(AddOrderItem event, Emitter<OrderState> emit) async {
+    emit(OrderLoading());
+    final isLoggedIn = await _isUserLoggedIn();
     try {
-      await _hiveService.addItemToCart(event.orderItem);
-      print('Added item: ${event.orderItem.toMap()}');
+      if (isLoggedIn) {
+        final user = FirebaseAuth.instance.currentUser;
+        final userId = user?.uid;
+        await _orderRepository.addItemToCart(
+            event.orderItem, userId.toString());
+      } else {
+        await _hiveService.addItemToCart(event.orderItem);
+      }
       add(LoadCart());
     } catch (e) {
       emit(OrderError(error: 'Failed to add item: ${e.toString()}'));
@@ -46,7 +61,11 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
   void _onSubmitOrder(SubmitOrder event, Emitter<OrderState> emit) async {
     emit(OrderLoading());
     try {
-      final cartItems = await _hiveService.getCartItems();
+      final isLoggedIn = await _isUserLoggedIn();
+      final cartItems = isLoggedIn
+          ? await _orderRepository.fetchCartItems(event.userId)
+          : await _hiveService.getCartItems();
+
       final orderList = OrderList(
         id: 'orderId',
         items: cartItems,
@@ -63,27 +82,31 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
         date: DateTime.now(),
       );
 
-      await _orderRepository.addOrder(orderList, event.userId);
-      await _hiveService.clearCart();
+      if (isLoggedIn) {
+        final user = FirebaseAuth.instance.currentUser;
+        await _orderRepository.addOrder(orderList, user!.uid);
+      } else {}
+
+      if (!isLoggedIn) {
+        await _hiveService.clearCart();
+      }
+
       emit(OrderSubmitted());
     } catch (e) {
       emit(OrderError(error: 'Failed to submit order: ${e.toString()}'));
     }
   }
 
-  void _onFetchOrders(FetchOrders event, Emitter<OrderState> emit) async {
-    emit(OrderLoading());
-    try {
-      final orders = await _orderRepository.fetchOrders(event.userId);
-      emit(OrderLoaded(orders: orders));
-    } catch (e) {
-      emit(OrderError(error: 'Failed to fetch orders: ${e.toString()}'));
-    }
-  }
-
   void _onLoadCart(LoadCart event, Emitter<OrderState> emit) async {
+    emit(OrderLoading());
+    final isLoggedIn = await _isUserLoggedIn();
+    final user = FirebaseAuth.instance.currentUser;
+    final userId = user?.uid;
     try {
-      final cartItems = await _hiveService.getCartItems();
+      final cartItems = isLoggedIn
+          ? await _orderRepository.fetchCartItems(userId.toString())
+          : await _hiveService.getCartItems();
+
       Position position = await _locationService.getCurrentPosition();
       String address = await _locationService.getAddressFromLatLng(position);
 
@@ -93,8 +116,6 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
           position.latitude, position.longitude, storeLat, storeLon);
       double deliveryFee = calculateDeliveryFee(distance);
 
-      print(
-          'Loaded cart items: ${cartItems.map((item) => item.toMap()).toList()}');
       final total = cartItems.fold(
           0, (sum, item) => sum + (item.price * item.quantity).toInt());
       final orderList = OrderList(
@@ -114,8 +135,17 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
 
   void _onRemoveOrderItem(
       RemoveOrderItem event, Emitter<OrderState> emit) async {
+    emit(OrderLoading());
+    final isLoggedIn = await _isUserLoggedIn();
     try {
-      await _hiveService.removeItemFromCart(event.orderItem);
+      if (isLoggedIn) {
+        final user = FirebaseAuth.instance.currentUser;
+        final userId = user?.uid;
+        await _orderRepository.removeItemFromCart(
+            event.orderItem, userId.toString());
+      } else {
+        await _hiveService.removeItemFromCart(event.orderItem);
+      }
       add(LoadCart());
     } catch (e) {
       emit(OrderError(error: 'Failed to remove item: ${e.toString()}'));
@@ -124,9 +154,23 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
 
   void _onUpdateOrderItemQuantity(
       UpdateOrderItemQuantity event, Emitter<OrderState> emit) async {
+    emit(OrderLoading());
+    final isLoggedIn = await _isUserLoggedIn();
     try {
-      await _hiveService.updateItemQuantityInCart(
-          event.orderItem, event.quantity);
+      if (isLoggedIn) {
+        final user = FirebaseAuth.instance.currentUser;
+        final userId = user?.uid;
+        if (userId != null) {
+          await _orderRepository.updateItemQuantityInCart(
+              event.orderItem, event.quantity, userId);
+        } else {
+          emit(const OrderError(error: 'User not logged in'));
+          return;
+        }
+      } else {
+        await _hiveService.updateItemQuantityInCart(
+            event.orderItem, event.quantity);
+      }
       add(LoadCart());
     } catch (e) {
       emit(
@@ -136,7 +180,28 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
 
   void _onLoadOrdersOnAppStart(
       LoadOrdersOnAppStart event, Emitter<OrderState> emit) async {
+    emit(OrderLoading());
     add(FetchOrders(userId: event.userId));
     add(LoadCart());
+  }
+
+  void _onLogout(Logout event, Emitter<OrderState> emit) async {
+    emit(OrderLoading());
+    try {
+      final isLoggedIn = await _isUserLoggedIn();
+      if (isLoggedIn) {
+        final user = FirebaseAuth.instance.currentUser;
+        final userId = user?.uid;
+        final cartItems = await _hiveService.getCartItems();
+        final cartData = cartItems.map((item) => item.toMap()).toList();
+        await _orderRepository.saveCartToUser(userId.toString(), cartData);
+        await _hiveService.clearCart();
+      } else {
+        await _hiveService.clearCart();
+      }
+      emit(LogoutSuccess());
+    } catch (e) {
+      emit(OrderError(error: 'Failed to handle logout: ${e.toString()}'));
+    }
   }
 }

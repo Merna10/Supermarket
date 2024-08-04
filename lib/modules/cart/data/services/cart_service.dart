@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:market/modules/cart/data/models/cart_item_model.dart';
 import 'package:market/shared/models/order_list.dart';
 
 class OrderService {
@@ -36,6 +37,22 @@ class OrderService {
       }
     } catch (e) {
       throw Exception(e.toString());
+    }
+  }
+  Future<List<OrderItem>> fetchCartItems(String userId) async {
+    try {
+      final cartSnapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('cart')
+          .get();
+
+      return cartSnapshot.docs.map((doc) {
+        final data = doc.data();
+        return OrderItem.fromMap(data);
+      }).toList();
+    } catch (e) {
+      throw Exception('Failed to fetch cart items: $e');
     }
   }
 }
