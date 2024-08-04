@@ -71,7 +71,7 @@ class _ProductCardState extends State<ProductCard> {
         });
       } else {
         setState(() {
-          this.quantity = 0;
+          quantity = 0;
         });
       }
     } catch (e) {

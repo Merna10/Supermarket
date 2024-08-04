@@ -75,7 +75,7 @@ class LoadOrdersOnAppStart extends OrderEvent {
 class Logout extends OrderEvent {
   final String userId;
 
-  Logout({required this.userId});
+  const Logout({required this.userId});
 
   @override
   List<Object> get props => [userId];

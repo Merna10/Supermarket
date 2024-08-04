@@ -8,7 +8,6 @@ import 'package:market/modules/cart/data/models/cart_item_model.dart';
 import 'package:market/shared/models/order_list.dart';
 import 'package:market/modules/cart/data/repositories/cart_repository.dart';
 import 'package:market/modules/cart/data/services/hive_services.dart';
-import 'package:market/modules/authentication/logic/bloc/auth_bloc.dart';
 
 part 'order_event.dart';
 part 'order_state.dart';

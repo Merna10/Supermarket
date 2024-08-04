@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,7 +7,6 @@ import 'package:market/app/routes/routes.dart';
 import 'package:market/app/theme/app_theme.dart';
 import 'package:market/core/services/location_service.dart';
 import 'package:market/modules/authentication/data/repositories/authentication_repository.dart';
-import 'package:market/modules/authentication/data/services/auth_service.dart';
 import 'package:market/modules/authentication/logic/bloc/auth_bloc.dart';
 import 'package:market/modules/cart/data/repositories/cart_repository.dart';
 import 'package:market/modules/cart/data/services/cart_service.dart';

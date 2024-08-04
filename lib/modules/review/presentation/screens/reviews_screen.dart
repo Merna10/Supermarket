@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:market/app/theme/app_theme.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:market/app/theme/text_styles.dart';
 import 'package:market/modules/review/logic/bloc/review_bloc.dart';
 import 'package:market/modules/review/data/model/review.dart';
@@ -108,6 +108,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor: HexColor('f1efde'),
         title: Text(
           'Reviews',
           style: AppTextStyles.textTheme.headlineMedium,
@@ -151,10 +152,11 @@ class _ReviewScreenState extends State<ReviewScreen> {
                             });
                             _startPageTimer(state.reviews.length);
                           },
-                          child: Container(
-                            padding: const EdgeInsets.all(16.0),
+                          child: Card(
+                            margin: const EdgeInsets.all(7),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(displayName,
                                     style: const TextStyle(
@@ -182,8 +184,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: HexColor('f1efde'),
         onPressed: _showReviewBottomSheet,
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
     );
   }

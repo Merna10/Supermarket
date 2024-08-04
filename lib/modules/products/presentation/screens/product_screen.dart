@@ -6,7 +6,6 @@ import 'package:market/app/theme/text_styles.dart';
 import 'package:market/modules/products/data/models/product.dart';
 import 'package:market/modules/products/logic/bloc/product_bloc.dart';
 import 'package:market/modules/products/presentation/widgets/product_card_widget.dart';
-import 'package:market/modules/products/presentation/screens/product_details_screen.dart';
 
 class ProductScreen extends StatelessWidget {
   final String categoryId;
