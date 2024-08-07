@@ -31,12 +31,14 @@ class OrderLoaded extends OrderState {
 
 class CartLoaded extends OrderState {
   final OrderList cartItems;
+  final List<OrderItem> outOfStockItems;
 
-  const CartLoaded({required this.cartItems});
-
-  @override
-  List<Object> get props => [cartItems];
+  const CartLoaded({
+    required this.cartItems,
+    required this.outOfStockItems,
+  });
 }
+
 
 class OrderSubmitted extends OrderState {}
 class LogoutSuccess extends OrderState {}

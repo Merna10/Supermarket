@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:market/shared/widgets/scaffold_with_nav_bar.dart';
-import 'package:market/modules/categories/data/models/category.dart';
+import 'package:market/modules/collection/data/models/collection.dart';
 import 'package:market/modules/products/presentation/screens/product_screen.dart';
+import 'package:market/shared/widgets/scaffold_with_nav_bar.dart';
 
-class CategoryCard extends StatelessWidget {
-  final Category category;
+class CollectionCard extends StatelessWidget {
+  final Collection collection;
 
-  const CategoryCard({super.key, required this.category});
+  const CollectionCard({super.key, required this.collection});
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +18,8 @@ class CategoryCard extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) => ScaffoldWithNavBar(
               child: ProductScreen(
-                id: category.id,
-                fetchMethod: FetchMethod.byCategory,
-
+                id: collection.id,
+                fetchMethod: FetchMethod.byCollection,
               ),
             ),
           ),
@@ -43,7 +42,7 @@ class CategoryCard extends StatelessWidget {
                 child: Stack(
                   children: [
                     Image.network(
-                      category.imageUrl,
+                      collection.imageUrl,
                       fit: BoxFit.cover,
                       height: double.infinity,
                     ),
@@ -53,9 +52,9 @@ class CategoryCard extends StatelessWidget {
                       right: 0,
                       child: Container(
                         padding: const EdgeInsets.all(8.0),
-                        color: Colors.black.withOpacity(0.5),
+                        color: const Color.fromARGB(137, 182, 172, 172),
                         child: Text(
-                          category.name,
+                          collection.name,
                           style: GoogleFonts.playfairDisplay(
                             textStyle: const TextStyle(
                               fontSize: 20,

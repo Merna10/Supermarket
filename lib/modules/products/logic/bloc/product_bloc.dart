@@ -14,6 +14,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       : _productRepository = productRepository,
         super(ProductInitial()) {
     on<FetchProductsByCategory>(_onFetchProductsByCategory);
+     on<FetchProductsByCollection>(_onFetchProductsByCollection);
   }
 
   void _onFetchProductsByCategory(FetchProductsByCategory event, Emitter<ProductState> emit) async {
@@ -25,4 +26,15 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       emit(ProductError(error: e.toString()));
     }
   }
+  void _onFetchProductsByCollection(FetchProductsByCollection event, Emitter<ProductState> emit) async {
+    emit(ProductLoading());
+    try {
+      final products = await _productRepository.fetchProductsByCollection(event.collection);
+      emit(ProductLoaded(products: products));
+    } catch (e) {
+      emit(ProductError(error: e.toString()));
+    }
+  }
+
+  
 }

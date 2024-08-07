@@ -1,16 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:market/modules/cart/data/models/cart_item_model.dart';
 import 'package:market/modules/cart/logic/bloc/order_bloc.dart';
-import 'package:hive/hive.dart';
 import 'package:market/modules/products/data/models/product.dart';
 import 'package:market/modules/products/presentation/screens/product_details_screen.dart';
 import 'package:market/modules/products/presentation/widgets/image_grid.dart';
 import 'package:market/modules/products/presentation/widgets/image_viewer.dart';
+import 'quantity_manager.dart';
 
 class ProductCard extends StatefulWidget {
   final Product product;
@@ -18,7 +16,6 @@ class ProductCard extends StatefulWidget {
   const ProductCard({
     super.key,
     required this.product,
-    
   });
 
   @override
@@ -26,131 +23,69 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  int quantity = 0;
+  late QuantityManager _quantityManager;
   int _currentImageIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _quantityManager = QuantityManager(widget.product);
     _loadQuantity();
   }
 
   Future<void> _loadQuantity() async {
-    final isLoggedIn = FirebaseAuth.instance.currentUser != null;
-
-    if (isLoggedIn) {
-      // Fetch quantity from Firestore
-      await _loadQuantityFromFirestore();
-    } else {
-      // Fetch quantity from Hive
-      await _loadQuantityFromHive();
-    }
-  }
-
-  Future<void> _loadQuantityFromFirestore() async {
-    try {
-      final userId = FirebaseAuth.instance.currentUser?.uid;
-
-      if (userId == null) {
-        throw Exception('User not logged in');
-      }
-
-      final docSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('cart')
-          .doc(widget.product.id)
-          .get();
-
-      if (docSnapshot.exists) {
-        final data = docSnapshot.data();
-        final quantity = data?['quantity'] ?? 0;
-
-        setState(() {
-          this.quantity = quantity;
-        });
-      } else {
-        setState(() {
-          quantity = 0;
-        });
-      }
-    } catch (e) {
-      print('Error loading quantity from Firestore: $e');
-    }
-  }
-
-  Future<void> _loadQuantityFromHive() async {
-    try {
-      var box = await Hive.openBox<OrderItem>('order');
-      final existingItem = box.values.firstWhere(
-        (item) => item.productId == widget.product.id,
-        orElse: () => OrderItem(
-          productId: widget.product.id,
-          productName: widget.product.name,
-          quantity: 0,
-          price: widget.product.price,
-          productImage:
-              widget.product.productImage.isNotEmpty ? widget.product.productImage.first : '',
-        ),
-      );
-
-      setState(() {
-        quantity = existingItem.quantity;
-      });
-    } catch (e) {
-      // Handle errors
-      print('Error loading quantity from Hive: $e');
-    }
+    await _quantityManager.loadQuantity();
+    setState(() {});
   }
 
   void _incrementQuantity() {
     setState(() {
-      quantity++;
+      _quantityManager.incrementQuantity();
     });
     _updateCart();
   }
 
   void _decrementQuantity() {
-    if (quantity > 0) {
-      setState(() {
-        quantity--;
-      });
-      _updateCart();
-    }
+    setState(() {
+      _quantityManager.decrementQuantity();
+    });
+    _updateCart();
   }
 
   void _updateCart() {
     final orderItem = OrderItem(
-     productId: widget.product.id,
-          productName: widget.product.name,
-          quantity: 0,
-          price: widget.product.price,
-          productImage:
-              widget.product.productImage.isNotEmpty ? widget.product.productImage.first : '',
+      productId: widget.product.id,
+      productName: widget.product.name,
+      quantity: 0,
+      price: widget.product.price,
+      productImage: widget.product.productImage.isNotEmpty
+          ? widget.product.productImage.first
+          : '',
     );
     BlocProvider.of<OrderBloc>(context).add(AddOrderItem(orderItem: orderItem));
     BlocProvider.of<OrderBloc>(context).add(UpdateOrderItemQuantity(
       orderItem: orderItem,
-      quantity: quantity,
+      quantity: _quantityManager.quantity,
     ));
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-       onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ProductDetailsScreen(product:widget.product ),
-                      ),
-                    );
-                  },
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailsScreen(
+              product: widget.product,
+              
+            ),
+          ),
+        );
+      },
       child: Card(
         color: Colors.white,
         elevation: 0,
-        
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -230,7 +165,8 @@ class _ProductCardState extends State<ProductCard> {
                       ),
                     ),
                   const SizedBox(height: 8),
-                  if (quantity == 0 && widget.product.availability)
+                  if (_quantityManager.quantity == 0 &&
+                      widget.product.availability)
                     Center(
                       child: TextButton(
                         onPressed: _incrementQuantity,
@@ -252,7 +188,8 @@ class _ProductCardState extends State<ProductCard> {
                         ),
                       ),
                     ),
-                  if (quantity != 0 && widget.product.availability)
+                  if (_quantityManager.quantity != 0 &&
+                      widget.product.availability)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -269,7 +206,7 @@ class _ProductCardState extends State<ProductCard> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          '$quantity',
+                          '${_quantityManager.quantity}',
                           style: GoogleFonts.roboto(
                             textStyle: const TextStyle(
                               fontSize: 20,
@@ -285,7 +222,10 @@ class _ProductCardState extends State<ProductCard> {
                             shape: BoxShape.circle,
                           ),
                           child: IconButton(
-                            onPressed: _incrementQuantity,
+                            onPressed: _quantityManager.quantity <
+                                    widget.product.quantity
+                                ? _incrementQuantity
+                                : null,
                             icon: const Icon(Icons.add),
                             color: Colors.white,
                           ),

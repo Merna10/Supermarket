@@ -65,11 +65,39 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
           ? await _orderRepository.fetchCartItems(event.userId)
           : await _hiveService.getCartItems();
 
+      final availableItems = <OrderItem>[];
+      final outOfStockItems = <OrderItem>[];
+
+      for (var item in cartItems) {
+        final currentQuantity =
+            await _orderRepository.getProductQuantity(item.productId);
+        final updatedQuantity = currentQuantity - item.quantity;
+
+        if (updatedQuantity < 0) {
+          // Item is out of stock
+          outOfStockItems.add(item);
+        } else {
+          availableItems.add(item);
+          if (updatedQuantity == 0) {
+            await _orderRepository.updateProductQuantity(
+                item.productId, updatedQuantity, event.userId);
+          } else {
+            await _orderRepository.updateProductQuantity(
+                item.productId, updatedQuantity, event.userId);
+          }
+        }
+      }
+
+      if (availableItems.isEmpty) {
+        emit(const OrderError(error: 'All items are out of stock.'));
+        return;
+      }
+
       final orderList = OrderList(
         id: 'orderId',
-        items: cartItems,
+        items: availableItems,
         status: 'pending',
-        total: cartItems
+        total: availableItems
                 .fold(
                   0,
                   (sum, item) => sum + (item.price * item.quantity).toInt(),
@@ -83,10 +111,11 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
 
       if (isLoggedIn) {
         final user = FirebaseAuth.instance.currentUser;
-        await _orderRepository.addOrder(orderList, user!.uid);
-      } else {}
+        final userId = user!.uid;
 
-      if (!isLoggedIn) {
+        await _orderRepository.addOrder(orderList, userId);
+        await _orderRepository.clearCart(userId);
+      } else {
         await _hiveService.clearCart();
       }
 
@@ -106,6 +135,19 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
           ? await _orderRepository.fetchCartItems(userId.toString())
           : await _hiveService.getCartItems();
 
+      final availableItems = <OrderItem>[];
+      final outOfStockItems = <OrderItem>[]; // Initialize outOfStockItems
+
+      for (var item in cartItems) {
+        final availability =
+            await _orderRepository.getAvailability(item.productId);
+        if (availability == true) {
+          availableItems.add(item);
+        } else {
+          outOfStockItems.add(item); // Add to outOfStockItems if not available
+        }
+      }
+
       Position position = await _locationService.getCurrentPosition();
       String address = await _locationService.getAddressFromLatLng(position);
 
@@ -115,18 +157,22 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
           position.latitude, position.longitude, storeLat, storeLon);
       double deliveryFee = calculateDeliveryFee(distance);
 
-      final total = cartItems.fold(
+      final total = availableItems.fold(
           0, (sum, item) => sum + (item.price * item.quantity).toInt());
+
       final orderList = OrderList(
         id: 'tempOrderId',
-        items: cartItems,
+        items: availableItems,
         status: 'pending',
         total: total.toDouble(),
         deliveryAddress: address,
         deliveryFee: deliveryFee,
         date: DateTime.now(),
       );
-      emit(CartLoaded(cartItems: orderList));
+
+      emit(CartLoaded(
+          cartItems: orderList,
+          outOfStockItems: outOfStockItems)); // Pass outOfStockItems
     } catch (e) {
       emit(OrderError(error: 'Failed to load cart: ${e.toString()}'));
     }
@@ -156,19 +202,34 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
     emit(OrderLoading());
     final isLoggedIn = await _isUserLoggedIn();
     try {
-      if (isLoggedIn) {
-        final user = FirebaseAuth.instance.currentUser;
-        final userId = user?.uid;
-        if (userId != null) {
-          await _orderRepository.updateItemQuantityInCart(
-              event.orderItem, event.quantity, userId);
+      if (event.quantity <= 0) {
+        if (isLoggedIn) {
+          final user = FirebaseAuth.instance.currentUser;
+          final userId = user?.uid;
+          if (userId != null) {
+            await _orderRepository.removeItemFromCart(event.orderItem, userId);
+          } else {
+            emit(const OrderError(error: 'User not logged in'));
+            return;
+          }
         } else {
-          emit(const OrderError(error: 'User not logged in'));
-          return;
+          await _hiveService.removeItemFromCart(event.orderItem);
         }
       } else {
-        await _hiveService.updateItemQuantityInCart(
-            event.orderItem, event.quantity);
+        if (isLoggedIn) {
+          final user = FirebaseAuth.instance.currentUser;
+          final userId = user?.uid;
+          if (userId != null) {
+            await _orderRepository.updateItemQuantityInCart(
+                event.orderItem, event.quantity, userId);
+          } else {
+            emit(const OrderError(error: 'User not logged in'));
+            return;
+          }
+        } else {
+          await _hiveService.updateItemQuantityInCart(
+              event.orderItem, event.quantity);
+        }
       }
       add(LoadCart());
     } catch (e) {
@@ -204,3 +265,4 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
     }
   }
 }
+

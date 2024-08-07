@@ -14,6 +14,8 @@ import 'package:market/modules/cart/data/services/hive_services.dart';
 import 'package:market/modules/cart/logic/bloc/order_bloc.dart';
 import 'package:market/modules/categories/data/repositories/category_repository.dart';
 import 'package:market/modules/categories/logic/bloc/category_bloc.dart';
+import 'package:market/modules/collection/data/repositories/collection_repository.dart';
+import 'package:market/modules/collection/logic/bloc/collection_bloc.dart';
 import 'package:market/modules/products/data/repositories/product_repository.dart';
 import 'package:market/modules/products/logic/bloc/product_bloc.dart';
 import 'package:market/modules/order_history/data/repositories/history_repository.dart';
@@ -35,7 +37,6 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final HiveService hiveService;
-  
 
   const MyApp({super.key, required this.hiveService});
 
@@ -44,27 +45,34 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
-          create: (_) => AuthBloc(authRepository: AuthRepository(), cartRepository: OrderRepository())
+          create: (_) => AuthBloc(
+              authRepository: AuthRepository(),
+              cartRepository: OrderRepository())
             ..add(AuthCheckStatusEvent()),
         ),
         BlocProvider<CategoryBloc>(
           create: (_) => CategoryBloc(categoryRepository: CategoryRepository()),
         ),
+        BlocProvider<CollectionBloc>(
+          create: (_) =>
+              CollectionBloc(collectionRepository: CollectionRepository()),
+        ),
         BlocProvider<ProductBloc>(
           create: (_) => ProductBloc(productRepository: ProductRepository()),
         ),
+        
         BlocProvider<OrderBloc>(
           create: (_) => OrderBloc(
             locationService: LocationService(),
             orderRepository: OrderRepository(orderService: OrderService()),
             hiveService: hiveService,
-            ),
+          ),
         ),
         BlocProvider<HistoryBloc>(
-          create: (_) => HistoryBloc(historyRepository:  HistoryRepository()),
+          create: (_) => HistoryBloc(historyRepository: HistoryRepository()),
         ),
         BlocProvider<ReviewBloc>(
-          create: (_) => ReviewBloc( ReviewRepository(ReviewService()))
+          create: (_) => ReviewBloc(ReviewRepository(ReviewService()))
             ..add(FetchReviewsEvent()),
         ),
       ],

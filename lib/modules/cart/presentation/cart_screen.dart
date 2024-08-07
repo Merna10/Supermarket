@@ -7,6 +7,7 @@ import 'package:market/core/services/location_service.dart';
 import 'package:market/core/utils/delivery_fee_util.dart';
 import 'package:market/modules/cart/logic/bloc/order_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:market/shared/widgets/drawer.dart';
 
 const double storeLat = 30.020760;
 const double storeLon = 31.395011;
@@ -119,15 +120,15 @@ class _CartScreenState extends State<CartScreen> {
         ),
         backgroundColor: HexColor('f1efde'),
       ),
+      drawer: const CustomDrawer(),
       body: BlocBuilder<OrderBloc, OrderState>(
         builder: (context, state) {
           if (state is OrderLoading) {
             return Center(
-                child: CircularProgressIndicator(
-              color: HexColor('f1efde'),
-            ));
+                child: CircularProgressIndicator(color: HexColor('f1efde')));
           } else if (state is CartLoaded) {
-            if (state.cartItems.items.isEmpty) {
+            if (state.cartItems.items.isEmpty &&
+                state.outOfStockItems.isEmpty) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -143,6 +144,7 @@ class _CartScreenState extends State<CartScreen> {
                 ],
               );
             }
+
             return Column(
               children: [
                 Expanded(
@@ -159,6 +161,7 @@ class _CartScreenState extends State<CartScreen> {
                         },
                         background: Container(color: Colors.red),
                         child: ListTile(
+                          onTap: () {},
                           leading: Image.network(
                             item.productImage,
                             fit: BoxFit.fill,
@@ -186,7 +189,7 @@ class _CartScreenState extends State<CartScreen> {
                                 },
                               ),
                               Text(
-                                  '${item.quantity} x \$${item.price.toStringAsFixed(2)}'),
+                                  '${item.quantity} x EGP ${item.price.toStringAsFixed(2)}'),
                               IconButton(
                                 icon: const Icon(Icons.add),
                                 onPressed: () {
@@ -199,12 +202,52 @@ class _CartScreenState extends State<CartScreen> {
                             ],
                           ),
                           trailing: Text(
-                              '\$${(item.quantity * item.price).toStringAsFixed(2)}'),
+                              'EGP ${(item.quantity * item.price).toStringAsFixed(2)}'),
                         ),
                       );
                     },
                   ),
                 ),
+                if (state.outOfStockItems.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Out of stock items:',
+                          style: AppTextStyles.textTheme.displaySmall,
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        ...state.outOfStockItems.map((item) => Dismissible(
+                              key: ValueKey(item.productId),
+                              onDismissed: (direction) {
+                                context
+                                    .read<OrderBloc>()
+                                    .add(RemoveOrderItem(orderItem: item));
+                              },
+                              background: Container(color: Colors.red),
+                              child: ListTile(
+                                leading: Image.network(
+                                  item.productImage,
+                                  fit: BoxFit.fill,
+                                  width:
+                                      MediaQuery.sizeOf(context).width * 0.15,
+                                ),
+                                title: Text(
+                                  item.productName,
+                                  style: AppTextStyles.textTheme.displaySmall,
+                                ),
+                                subtitle: const Text(
+                                  'Out of Stock',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ))
+                      ],
+                    ),
+                  ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -266,9 +309,11 @@ class _CartScreenState extends State<CartScreen> {
                           style: AppTextStyles.textTheme.labelLarge,
                         ),
                       ),
-                      Text(
-                        '+${_deliveryFee.toStringAsFixed(2)} delivery fees',
-                        style: AppTextStyles.textTheme.bodySmall,
+                      Flexible(
+                        child: Text(
+                          '+${_deliveryFee.toStringAsFixed(2)} delivery fees',
+                          style: AppTextStyles.textTheme.bodyMedium,
+                        ),
                       ),
                     ],
                   ),

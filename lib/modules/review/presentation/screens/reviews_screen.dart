@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:market/app/theme/text_styles.dart';
 import 'package:market/modules/review/logic/bloc/review_bloc.dart';
 import 'package:market/modules/review/data/model/review.dart';
 
@@ -106,14 +105,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: HexColor('f1efde'),
-        title: Text(
-          'Reviews',
-          style: AppTextStyles.textTheme.headlineMedium,
-        ),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

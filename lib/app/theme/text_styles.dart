@@ -23,7 +23,7 @@ class AppTextStyles {
       letterSpacing: 0.25,
     ),
     headlineSmall: GoogleFonts.playfairDisplay(
-      fontSize: 24.0,
+      fontSize: 30.0,
       fontWeight: FontWeight.bold,
     ),
     titleLarge: GoogleFonts.playfairDisplay(
@@ -53,7 +53,7 @@ class AppTextStyles {
       letterSpacing: 0.25,
     ),
     labelLarge: GoogleFonts.playfairDisplay(
-      fontSize: 14.0,
+      fontSize: 20.0,
       fontWeight: FontWeight.bold,
       letterSpacing: 1.25,
     ),

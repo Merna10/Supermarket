@@ -6,6 +6,7 @@ import 'package:market/app/theme/text_styles.dart';
 import 'package:market/modules/categories/data/models/category.dart';
 import 'package:market/modules/categories/logic/bloc/category_bloc.dart';
 import 'package:market/modules/categories/presentation/widgets/category_card_widget.dart';
+import 'package:market/shared/widgets/drawer.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
@@ -28,6 +29,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         ),
         backgroundColor: HexColor('f1efde'),
       ),
+      drawer: const CustomDrawer(),
       body: BlocBuilder<CategoryBloc, CategoryState>(
         builder: (context, state) {
           if (state is CategoryInitial) {

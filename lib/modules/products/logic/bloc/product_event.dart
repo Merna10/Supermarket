@@ -16,3 +16,12 @@ class FetchProductsByCategory extends ProductEvent {
   @override
   List<Object> get props => [category];
 }
+class FetchProductsByCollection extends ProductEvent {
+  final String collection;
+
+  const FetchProductsByCollection({required this.collection});
+
+  @override
+  List<Object> get props => [collection];
+}
+

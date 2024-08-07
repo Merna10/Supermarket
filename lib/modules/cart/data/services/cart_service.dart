@@ -102,4 +102,34 @@ class OrderService {
       throw Exception('Failed to update item quantity: $e');
     }
   }
+  Future<int> getProductQuantity(String productId) async {
+    final doc = await FirebaseFirestore.instance.collection('products').doc(productId).get();
+    return doc.data()?['quantity'] ?? 0;
+  }
+
+Future<bool> getAvailability(String productId) async {
+  final doc = await FirebaseFirestore.instance.collection('products').doc(productId).get();
+  return doc.data()?['availability'] ?? false;
+}
+
+
+  Future<void> updateProductQuantity(String productId, int newQuantity,  ) async {
+    await FirebaseFirestore.instance.collection('products').doc(productId).update({'quantity': newQuantity});
+  }
+
+  Future<void> updateProductAvailability(String productId  ) async {
+    await FirebaseFirestore.instance.collection('products').doc(productId).update({'availability': false});
+  }
+
+  Future<void> clearCart(String userId) async {
+    final cartCollection = FirebaseFirestore.instance.collection('users').doc(userId).collection('cart');
+    final querySnapshot = await cartCollection.get();
+    final batch = FirebaseFirestore.instance.batch();
+
+    for (var doc in querySnapshot.docs) {
+      batch.delete(doc.reference);
+    }
+
+    await batch.commit();
+  }
 }

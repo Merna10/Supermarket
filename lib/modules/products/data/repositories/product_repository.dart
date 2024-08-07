@@ -10,4 +10,12 @@ class ProductRepository {
   Future<List<Product>> fetchProductsByCategory(String category) {
     return _productService.fetchProductsByCategory(category);
   }
+
+  Future<List<Product>> fetchProductsByCollection(String collection) {
+    return _productService.fetchProductsByCollection(collection);
+  }
+
+  Future<int> fetchProductQuantity(String productId) async {
+    return _productService.fetchProductQuantity(productId);
+  }
 }

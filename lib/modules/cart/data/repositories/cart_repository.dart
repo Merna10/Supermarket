@@ -3,7 +3,7 @@ import 'package:market/modules/cart/data/services/cart_service.dart';
 import 'package:market/shared/models/order_list.dart';
 
 class OrderRepository {
- final OrderService _orderService;
+  final OrderService _orderService;
 
   OrderRepository({OrderService? orderService})
       : _orderService = orderService ?? OrderService();
@@ -32,5 +32,27 @@ class OrderRepository {
   Future<void> updateItemQuantityInCart(
       OrderItem item, int quantity, String userId) async {
     return _orderService.updateItemQuantityInCart(item, quantity, userId);
+  }
+
+  Future<int> getProductQuantity(String productId)  async {
+    return _orderService.getProductQuantity(productId);
+  }
+
+  Future<bool> getAvailability(String productId) async {
+    return _orderService.getAvailability(productId);
+  }
+
+  Future<void> updateProductQuantity(
+      String productId, int newQuantity, String userId) async {
+    return _orderService.updateProductQuantity(productId, newQuantity,);
+  }
+
+   Future<void> updateProductAvailability(
+      String productId,) async {
+    return _orderService.updateProductAvailability(productId,  );
+  }
+
+  Future<void> clearCart(String userId) async {
+    return _orderService.clearCart(userId);
   }
 }
