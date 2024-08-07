@@ -14,12 +14,11 @@ class AuthSignUpEvent extends AuthEvent {
   final String password;
   final String userName;
   final String phoneNumber;
-  final String location;
 
-  const AuthSignUpEvent({required this.email, required this.password, required this.userName, required this.phoneNumber, required this.location});
+  const AuthSignUpEvent({required this.email, required this.password, required this.userName, required this.phoneNumber});
 
   @override
-  List<Object> get props => [email, password, userName, phoneNumber, location];
+  List<Object> get props => [email, password, userName, phoneNumber, ];
 }
 
 class AuthLoginEvent extends AuthEvent {

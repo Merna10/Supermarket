@@ -59,7 +59,7 @@ class CustomDrawer extends StatelessWidget {
                             title: const Text('Login'),
                             onTap: () {
                               Navigator.pop(context);
-                              Navigator.pushNamed(context, '/login');
+                              Navigator.pushNamed(context, '/');
                             },
                           ),
                           ListTile(

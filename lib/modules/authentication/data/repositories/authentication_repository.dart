@@ -7,8 +7,8 @@ class AuthRepository {
   AuthRepository({AuthService? authService})
       : _authService = authService ?? AuthService();
 
-  Future<User?> signUp(String email, String password, String userName, String phoneNumber, String location) {
-    return _authService.signUp(email, password, userName, phoneNumber, location);
+  Future<User?> signUp(String email, String password, String userName, String phoneNumber, ) {
+    return _authService.signUp(email, password, userName, phoneNumber, );
   }
 
   Future<User?> login(String email, String password) {
