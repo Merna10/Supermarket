@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:market/shared/models/order_list.dart';
 
 class HistoryService {
@@ -8,35 +7,44 @@ class HistoryService {
   HistoryService({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  Future<List<OrderList>> fetchOrders() async {
+  Stream<List<OrderList>> fetchOrders({String status = 'All'}) {
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      final userId = user?.uid;
+      var query =
+          _firestore.collection('orders').orderBy('date', descending: true);
 
-      if (userId == null) {
-        throw Exception('User is not logged in');
+      if (status != 'All') {
+        query = query.where('status', isEqualTo: status);
       }
 
-      final QuerySnapshot snapshot = await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('orders')
-          .get();
-
-      return snapshot.docs
-          .map((doc) {
-            try {
-              return OrderList.fromFirestore(doc);
-            } catch (e) {
-              print('Error processing document ${doc.id}: ${e.toString()}');
-              return null; // Or handle as per your error strategy
-            }
-          })
-          .whereType<OrderList>()
-          .toList();
+      return query.snapshots().map((snapshot) =>
+          snapshot.docs.map((doc) => OrderList.fromFirestore(doc)).toList());
     } catch (e) {
-      print('Failed to fetch orders: ${e.toString()}');
-      throw Exception('Failed to fetch orders: ${e.toString()}');
+      throw Exception(e.toString());
     }
+  }
+
+  Stream<List<OrderList>> fetchUserOrders(
+      {required String userId, String status = 'All'}) {
+    try {
+      var query = _firestore
+          .collection('orders')
+          .where('userId', isEqualTo: userId)
+          .orderBy('date', descending: true);
+
+      if (status != 'All') {
+        query = query.where('status', isEqualTo: status);
+      }
+
+      return query.snapshots().map((snapshot) =>
+          snapshot.docs.map((doc) => OrderList.fromFirestore(doc)).toList());
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+   Future<void> updateOrderStatus({required String orderId, required String newStatus}) async {
+    await _firestore.collection('orders').doc(orderId).update({
+      'status': newStatus,
+    });
   }
 }

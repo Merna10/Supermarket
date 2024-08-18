@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:market/app/theme/colors.dart';
 import 'package:market/app/theme/text_styles.dart';
 import 'package:market/modules/authentication/logic/bloc/auth_bloc.dart';
-import 'package:market/modules/authentication/presentation/widgets/signup_email_page.dart';
-import 'package:market/modules/authentication/presentation/widgets/signup_user_details_page.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -59,8 +58,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       child: Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          border:
-                              Border.all(color: HexColor('f1efde'), width: 2),
+                          border: Border.all(
+                              color: AppColors.primaryColor, width: 2),
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: Padding(
@@ -71,7 +70,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               Container(
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                      color: HexColor('f1efde'), width: 2),
+                                      color: AppColors.primaryColor, width: 2),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: TextField(
@@ -88,11 +87,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               Container(
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                      color: HexColor('f1efde'), width: 2),
+                                      color: AppColors.primaryColor, width: 2),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: TextField(
-                                  cursorColor: HexColor('f1efde'),
+                                  cursorColor: AppColors.primaryColor,
                                   textAlign: TextAlign.center,
                                   controller: _passwordController,
                                   decoration: const InputDecoration(
@@ -106,7 +105,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               Container(
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                      color: HexColor('f1efde'), width: 2),
+                                      color: AppColors.primaryColor, width: 2),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: TextField(
@@ -123,11 +122,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               Container(
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                      color: HexColor('f1efde'), width: 2),
+                                      color: AppColors.primaryColor, width: 2),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: TextField(
-                                  cursorColor: HexColor('f1efde'),
+                                  cursorColor: AppColors.primaryColor,
                                   textAlign: TextAlign.center,
                                   controller: _phoneNumberController,
                                   decoration: const InputDecoration(
@@ -142,19 +141,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 width: double.infinity,
                                 child: TextButton(
                                   onPressed: () {
-                                    context
-                                        .read<AuthBloc>()
-                                        .add(AuthSignUpEvent(
-                                          email: _emailController.text,
-                                          password: _passwordController.text,
-                                          userName: _userNameController.text,
-                                          phoneNumber:
-                                              _phoneNumberController.text,
-                                        ));
+                                    context.read<AuthBloc>().add(
+                                        AuthSignUpEvent(
+                                            email: _emailController.text,
+                                            password: _passwordController.text,
+                                            userName: _userNameController.text,
+                                            phoneNumber:
+                                                _phoneNumberController.text,
+                                            role: 'customer'));
                                   },
                                   style: TextButton.styleFrom(
                                     foregroundColor: Colors.white,
-                                    backgroundColor: HexColor('f1efde'),
+                                    backgroundColor: AppColors.primaryColor,
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 24, vertical: 12),
                                   ),

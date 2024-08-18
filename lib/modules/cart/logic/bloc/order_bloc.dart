@@ -45,9 +45,8 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
     try {
       if (isLoggedIn) {
         final user = FirebaseAuth.instance.currentUser;
-        final userId = user?.uid;
-        await _orderRepository.addItemToCart(
-            event.orderItem, userId.toString());
+        final userId = user?.uid ?? '';
+        await _orderRepository.addItemToCart(event.orderItem, userId);
       } else {
         await _hiveService.addItemToCart(event.orderItem);
       }
@@ -61,8 +60,11 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
     emit(OrderLoading());
     try {
       final isLoggedIn = await _isUserLoggedIn();
+      final user = FirebaseAuth.instance.currentUser;
+      final userId = user?.uid ?? '';
+
       final cartItems = isLoggedIn
-          ? await _orderRepository.fetchCartItems(event.userId)
+          ? await _orderRepository.fetchCartItems(userId)
           : await _hiveService.getCartItems();
 
       final availableItems = <OrderItem>[];
@@ -74,16 +76,16 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
         final updatedQuantity = currentQuantity - item.quantity;
 
         if (updatedQuantity < 0) {
-          // Item is out of stock
           outOfStockItems.add(item);
         } else {
           availableItems.add(item);
           if (updatedQuantity == 0) {
             await _orderRepository.updateProductQuantity(
-                item.productId, updatedQuantity, event.userId);
+                item.productId, updatedQuantity, userId);
+            await _orderRepository.updateProductAvailability(item.productId);
           } else {
             await _orderRepository.updateProductQuantity(
-                item.productId, updatedQuantity, event.userId);
+                item.productId, updatedQuantity, userId);
           }
         }
       }
@@ -92,27 +94,26 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
         emit(const OrderError(error: 'All items are out of stock.'));
         return;
       }
+      final double total = availableItems.fold(
+            0.0,
+            (sum, item) => sum + (item.price * item.quantity),
+          ) +
+          event.deliveryFees;
 
       final orderList = OrderList(
         id: 'orderId',
+        userId: userId,
         items: availableItems,
-        status: 'pending',
-        total: availableItems
-                .fold(
-                  0,
-                  (sum, item) => sum + (item.price * item.quantity).toInt(),
-                )
-                .toDouble() +
-            event.deliveryFees,
+        status: 'Placed',
+        phoneNumber: event.phoneNumber,
+        userName: event.userName,
+        total: total,
         deliveryAddress: event.deliveryAddress,
         deliveryFee: event.deliveryFees,
         date: DateTime.now(),
       );
 
       if (isLoggedIn) {
-        final user = FirebaseAuth.instance.currentUser;
-        final userId = user!.uid;
-
         await _orderRepository.addOrder(orderList, userId);
         await _orderRepository.clearCart(userId);
       } else {
@@ -129,14 +130,14 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
     emit(OrderLoading());
     final isLoggedIn = await _isUserLoggedIn();
     final user = FirebaseAuth.instance.currentUser;
-    final userId = user?.uid;
+    final userId = user?.uid ?? '';
     try {
       final cartItems = isLoggedIn
-          ? await _orderRepository.fetchCartItems(userId.toString())
+          ? await _orderRepository.fetchCartItems(userId)
           : await _hiveService.getCartItems();
 
       final availableItems = <OrderItem>[];
-      final outOfStockItems = <OrderItem>[]; // Initialize outOfStockItems
+      final outOfStockItems = <OrderItem>[];
 
       for (var item in cartItems) {
         final availability =
@@ -144,7 +145,7 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
         if (availability == true) {
           availableItems.add(item);
         } else {
-          outOfStockItems.add(item); // Add to outOfStockItems if not available
+          outOfStockItems.add(item);
         }
       }
 
@@ -157,22 +158,29 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
           position.latitude, position.longitude, storeLat, storeLon);
       double deliveryFee = calculateDeliveryFee(distance);
 
-      final total = availableItems.fold(
-          0, (sum, item) => sum + (item.price * item.quantity).toInt());
+      final double total = availableItems.fold(
+          0, (sum, item) => sum + (item.price * item.quantity));
+
+      String phoneNumber = isLoggedIn
+          ? await _orderRepository.getUserPhoneNumber(userId)
+          : 'Not Available';
+      String userName =
+          isLoggedIn ? await _orderRepository.getUserName(userId) : 'Guest';
 
       final orderList = OrderList(
         id: 'tempOrderId',
         items: availableItems,
-        status: 'pending',
-        total: total.toDouble(),
+        status: 'Placed',
+        total: total,
         deliveryAddress: address,
         deliveryFee: deliveryFee,
+        phoneNumber: phoneNumber,
+        userName: userName,
         date: DateTime.now(),
+        userId: userId,
       );
 
-      emit(CartLoaded(
-          cartItems: orderList,
-          outOfStockItems: outOfStockItems)); // Pass outOfStockItems
+      emit(CartLoaded(cartItems: orderList, outOfStockItems: outOfStockItems));
     } catch (e) {
       emit(OrderError(error: 'Failed to load cart: ${e.toString()}'));
     }
@@ -182,12 +190,11 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       RemoveOrderItem event, Emitter<OrderState> emit) async {
     emit(OrderLoading());
     final isLoggedIn = await _isUserLoggedIn();
+    final user = FirebaseAuth.instance.currentUser;
+    final userId = user?.uid ?? '';
     try {
       if (isLoggedIn) {
-        final user = FirebaseAuth.instance.currentUser;
-        final userId = user?.uid;
-        await _orderRepository.removeItemFromCart(
-            event.orderItem, userId.toString());
+        await _orderRepository.removeItemFromCart(event.orderItem, userId);
       } else {
         await _hiveService.removeItemFromCart(event.orderItem);
       }
@@ -201,31 +208,19 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       UpdateOrderItemQuantity event, Emitter<OrderState> emit) async {
     emit(OrderLoading());
     final isLoggedIn = await _isUserLoggedIn();
+    final user = FirebaseAuth.instance.currentUser;
+    final userId = user?.uid ?? '';
     try {
       if (event.quantity <= 0) {
         if (isLoggedIn) {
-          final user = FirebaseAuth.instance.currentUser;
-          final userId = user?.uid;
-          if (userId != null) {
-            await _orderRepository.removeItemFromCart(event.orderItem, userId);
-          } else {
-            emit(const OrderError(error: 'User not logged in'));
-            return;
-          }
+          await _orderRepository.removeItemFromCart(event.orderItem, userId);
         } else {
           await _hiveService.removeItemFromCart(event.orderItem);
         }
       } else {
         if (isLoggedIn) {
-          final user = FirebaseAuth.instance.currentUser;
-          final userId = user?.uid;
-          if (userId != null) {
-            await _orderRepository.updateItemQuantityInCart(
-                event.orderItem, event.quantity, userId);
-          } else {
-            emit(const OrderError(error: 'User not logged in'));
-            return;
-          }
+          await _orderRepository.updateItemQuantityInCart(
+              event.orderItem, event.quantity, userId);
         } else {
           await _hiveService.updateItemQuantityInCart(
               event.orderItem, event.quantity);
@@ -251,18 +246,17 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       final isLoggedIn = await _isUserLoggedIn();
       if (isLoggedIn) {
         final user = FirebaseAuth.instance.currentUser;
-        final userId = user?.uid;
+        final userId = user?.uid ?? '';
         final cartItems = await _hiveService.getCartItems();
         final cartData = cartItems.map((item) => item.toMap()).toList();
-        await _orderRepository.saveCartToUser(userId.toString(), cartData);
+        await _orderRepository.saveCartToUser(userId, cartData);
         await _hiveService.clearCart();
       } else {
         await _hiveService.clearCart();
       }
       emit(LogoutSuccess());
     } catch (e) {
-      emit(OrderError(error: 'Failed to handle logout: ${e.toString()}'));
+      emit(OrderError(error: 'Failed to log out: ${e.toString()}'));
     }
   }
 }
-

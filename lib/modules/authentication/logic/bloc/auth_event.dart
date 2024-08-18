@@ -1,4 +1,4 @@
-// lib/bloc/auth_event.dart
+
 part of 'auth_bloc.dart';
 
 
@@ -14,11 +14,12 @@ class AuthSignUpEvent extends AuthEvent {
   final String password;
   final String userName;
   final String phoneNumber;
+  final String role;
 
-  const AuthSignUpEvent({required this.email, required this.password, required this.userName, required this.phoneNumber});
+  const AuthSignUpEvent({required this.email, required this.password, required this.userName, required this.phoneNumber, required this.role});
 
   @override
-  List<Object> get props => [email, password, userName, phoneNumber, ];
+  List<Object> get props => [email, password, userName, phoneNumber,role ];
 }
 
 class AuthLoginEvent extends AuthEvent {
@@ -34,3 +35,9 @@ class AuthLoginEvent extends AuthEvent {
 class AuthLogoutEvent extends AuthEvent {}
 
 class AuthCheckStatusEvent extends AuthEvent {}
+
+
+/*
+admin@admin.com
+flourishadmin
+*/

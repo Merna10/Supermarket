@@ -15,4 +15,44 @@ class CategoryService {
       throw Exception(e.toString());
     }
   }
+
+  Future<void> addCategory(Category category) async {
+    try {
+      await _firestore
+          .collection('categories')
+          .doc(category.id).set(category.toMap());
+          
+     } catch (e) {
+      print('Failed to add category: $e');
+      throw Exception('Failed to add categories: $e');
+    }
+  }
+
+  Future<void> deleteCategory(Category category) async {
+    try {
+      await _firestore
+          .collection('categories')
+          .doc(category.id).delete();
+          
+     } catch (e) {
+      print('Failed to delete category: $e');
+      throw Exception('Failed to delete categories: $e');
+    }
+  }
+
+  Future<String> fetchCategoryName(String categoryID) async {
+  try {
+    final docSnapshot = await _firestore.collection('categories').doc(categoryID).get();
+    if (docSnapshot.exists) {
+      final data = docSnapshot.data();
+      return data?['name'] ?? 'Unknown Category'; 
+    } else {
+      throw Exception('Category not found');
+    }
+  } catch (e) {
+    print('Failed to get category: $e');
+    throw Exception('Failed to get category: $e');
+  }
+}
+
 }

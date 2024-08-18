@@ -4,13 +4,15 @@ class Collection {
   final String id;
   final String name;
   final String imageUrl;
+  final String description;
   final DateTime dateAdded;
 
   Collection({
     required this.id,
     required this.name,
     required this.imageUrl,
-    required this.dateAdded, 
+    required this.description,
+    required this.dateAdded,
   });
 
   factory Collection.fromFirestore(DocumentSnapshot doc) {
@@ -19,7 +21,8 @@ class Collection {
       id: doc.id,
       name: data['name'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
-      dateAdded: (data['dateAdded'] as Timestamp).toDate(), 
+      description: data['description'] ?? '',
+      dateAdded: (data['dateAdded'] as Timestamp).toDate(),
     );
   }
 
@@ -28,7 +31,8 @@ class Collection {
       'id': id,
       'name': name,
       'imageUrl': imageUrl,
-      'dateAdded': Timestamp.fromDate(dateAdded), 
+      'description': description,
+      'dateAdded': Timestamp.fromDate(dateAdded),
     };
   }
 }

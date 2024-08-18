@@ -6,10 +6,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:market/app/routes/routes.dart';
 import 'package:market/app/theme/app_theme.dart';
 import 'package:market/core/services/location_service.dart';
+import 'package:market/modules/admins/data/repositories/admin_repository.dart';
+import 'package:market/modules/admins/logic/bloc/admin_bloc.dart';
 import 'package:market/modules/authentication/data/repositories/authentication_repository.dart';
 import 'package:market/modules/authentication/logic/bloc/auth_bloc.dart';
 import 'package:market/modules/cart/data/repositories/cart_repository.dart';
-import 'package:market/modules/cart/data/services/cart_service.dart';
 import 'package:market/modules/cart/data/services/hive_services.dart';
 import 'package:market/modules/cart/logic/bloc/order_bloc.dart';
 import 'package:market/modules/categories/data/repositories/category_repository.dart';
@@ -45,10 +46,15 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
-          create: (_) => AuthBloc(
+          create: (_) {
+            final authBloc = AuthBloc(
               authRepository: AuthRepository(),
-              cartRepository: OrderRepository())
-            ..add(AuthCheckStatusEvent()),
+              cartRepository: OrderRepository(),
+            );
+            authBloc.add(AuthCheckStatusEvent());
+
+            return authBloc;
+          },
         ),
         BlocProvider<CategoryBloc>(
           create: (_) => CategoryBloc(categoryRepository: CategoryRepository()),
@@ -60,11 +66,13 @@ class MyApp extends StatelessWidget {
         BlocProvider<ProductBloc>(
           create: (_) => ProductBloc(productRepository: ProductRepository()),
         ),
-        
+        BlocProvider<AdminBloc>(
+          create: (_) => AdminBloc(AdminRepository()),
+        ),
         BlocProvider<OrderBloc>(
           create: (_) => OrderBloc(
             locationService: LocationService(),
-            orderRepository: OrderRepository(orderService: OrderService()),
+            orderRepository: OrderRepository(),
             hiveService: hiveService,
           ),
         ),

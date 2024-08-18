@@ -11,20 +11,22 @@ class HistoryInitial extends HistoryState {}
 
 class HistoryLoading extends HistoryState {}
 
-class HistoryLoaded extends HistoryState {
+class HistoryLoadedList extends HistoryState {
   final List<OrderList> orders;
 
-  const HistoryLoaded({required this.orders});
+  const HistoryLoadedList({required this.orders});
 
   @override
   List<Object> get props => [orders];
 }
 
-class HistoryError extends HistoryState {
+class HistoryErrors extends HistoryState {
   final String error;
 
-  const HistoryError({required this.error});
+  const HistoryErrors({required this.error});
 
   @override
   List<Object> get props => [error];
 }
+
+class StatusUpdateSuccess extends HistoryState {}

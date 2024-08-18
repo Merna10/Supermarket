@@ -39,6 +39,18 @@ class CartLoaded extends OrderState {
   });
 }
 
+class UserDetailsUpdated extends OrderState {
+  final String username;
+  final String phoneNumber;
+
+  const UserDetailsUpdated({required this.username, required this.phoneNumber});
+
+  @override
+  List<Object> get props => [username, phoneNumber];
+}
 
 class OrderSubmitted extends OrderState {}
+
+class OrderQuantityUpdated extends OrderState {}
+
 class LogoutSuccess extends OrderState {}

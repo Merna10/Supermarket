@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:market/app/theme/colors.dart';
 
 class QuantityWidget extends StatelessWidget {
   final int quantity;
@@ -46,7 +47,7 @@ class QuantityWidget extends StatelessWidget {
         const SizedBox(width: 6),
         Container(
           decoration: BoxDecoration(
-            color: HexColor('f1efde'),
+            color: AppColors.primaryColor,
             shape: BoxShape.circle,
           ),
           child: IconButton(

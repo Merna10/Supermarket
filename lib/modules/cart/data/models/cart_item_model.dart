@@ -34,7 +34,7 @@ class OrderItem {
       productId: doc.id,
       productName: data['productName'] as String? ?? '',
       quantity: data['quantity'] as int? ?? 0,
-      price: data['price'] as double? ?? 0.0,
+      price: data['price'] ?? 0.0,
       productImage: data['productImage'] as String? ?? '',
     );
   }
@@ -44,7 +44,7 @@ class OrderItem {
       productId: map['productId'] as String? ?? '',
       productName: map['productName'] as String? ?? '',
       quantity: map['quantity'] as int? ?? 0,
-      price: map['price'] as double? ?? 0.0,
+      price: map['price'] ?? 0.0,
       productImage: map['productImage'] as String? ?? '',
     );
   }

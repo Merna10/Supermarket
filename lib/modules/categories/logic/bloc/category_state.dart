@@ -20,6 +20,15 @@ class CategoryLoaded extends CategoryState {
   List<Object> get props => [categories];
 }
 
+class CategoryNameLoaded extends CategoryState {
+  final String categoryName;
+
+  const CategoryNameLoaded({required this.categoryName});
+
+  @override
+  List<Object> get props => [categoryName];
+}
+
 class CategoryError extends CategoryState {
   final String error;
 

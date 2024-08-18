@@ -1,17 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:market/core/enum/fetch_method.dart';
 import 'package:market/modules/collection/data/models/collection.dart';
+import 'package:market/modules/collection/logic/bloc/collection_bloc.dart';
 import 'package:market/modules/products/presentation/screens/product_screen.dart';
 import 'package:market/shared/widgets/scaffold_with_nav_bar.dart';
 
 class CollectionCard extends StatelessWidget {
   final Collection collection;
+  final bool canDelete;
 
-  const CollectionCard({super.key, required this.collection});
+  const CollectionCard({
+    super.key,
+    required this.collection,
+    required this.canDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      onLongPress: () {
+        if (canDelete) {
+          _showDeleteConfirmationDialog(context);
+        }
+      },
       onTap: () {
         Navigator.push(
           context,
@@ -73,6 +86,45 @@ class CollectionCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  // void _sendNotificationToAdmin() async {
+  //   const adminEmail = 'zefyiciyda@gufum.com';
+  //   const subject = 'Product Out of Stock/Unavailable Notification';
+  //   final body = 'Product ${collection.name} is out of stock or unavailable.';
+
+  //   await ProductService().sendEmailNotification(adminEmail, subject, body);
+  // }
+
+  void _showDeleteConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Collection'),
+          content:
+              const Text('Are you sure you want to delete this collection?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                context
+                    .read<CollectionBloc>()
+                    .add(RemoveCollectionItem(collection: collection));
+             //   _sendNotificationToAdmin();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

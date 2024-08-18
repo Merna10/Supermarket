@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:hexcolor/hexcolor.dart';
+import 'package:market/app/theme/colors.dart';
 import 'package:market/app/theme/text_styles.dart';
-import 'package:market/core/services/location_service.dart';
-import 'package:market/core/utils/delivery_fee_util.dart';
 import 'package:market/modules/cart/logic/bloc/order_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:market/shared/widgets/drawer.dart';
@@ -20,90 +17,22 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  String _deliveryAddress = '';
-  double _deliveryFee = 0.0;
-
-  final LocationService _locationService = LocationService();
-  final TextEditingController _addressController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
-    _fetchLocationAndCalculateFee();
     context.read<OrderBloc>().add(LoadCart());
   }
 
-  Future<void> _fetchLocationAndCalculateFee() async {
-    try {
-      Position position = await _locationService.getCurrentPosition();
-      String address = await _locationService.getAddressFromLatLng(position);
-      double distance = calculateDistance(
-          position.latitude, position.longitude, storeLat, storeLon);
-      double deliveryFee = calculateDeliveryFee(distance);
-
-      setState(() {
-        _deliveryAddress = address;
-        _deliveryFee = deliveryFee;
-      });
-    } catch (e) {
-      setState(() {
-        _deliveryAddress = 'Failed to get location';
-        _deliveryFee = 0.0;
-      });
-    }
-  }
-
-  Future<void> _selectNewAddress() async {
-    final address = await showDialog<String>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Enter New Address'),
-          content: TextField(
-            controller: _addressController,
-            decoration: const InputDecoration(hintText: 'Address'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, _addressController.text),
-              child: const Text('Submit'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (address != null && address.isNotEmpty) {
-      try {
-        Position position =
-            await _locationService.getCoordinatesFromAddress(address);
-        double distance = calculateDistance(
-            position.latitude, position.longitude, storeLat, storeLon);
-        double deliveryFee = calculateDeliveryFee(distance);
-
-        setState(() {
-          _deliveryAddress = address;
-          _deliveryFee = deliveryFee;
-        });
-      } catch (e) {
-        setState(() {
-          _deliveryAddress = 'Failed to get location from address';
-          _deliveryFee = 0.0;
-        });
-      }
-    }
-  }
-
-  Future<void> _handleCheckout() async {
+  Future<void> _handleCheckout(double totalPrice) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       Navigator.pushNamed(context, '/');
     } else {
-      context.read<OrderBloc>().add(SubmitOrder(
-            userId: user.uid,
-            deliveryAddress: _deliveryAddress,
-            deliveryFees: _deliveryFee,
-          ));
+      Navigator.pushNamed(
+        context,
+        '/checkout',
+        arguments: totalPrice,
+      );
     }
   }
 
@@ -118,14 +47,15 @@ class _CartScreenState extends State<CartScreen> {
             style: AppTextStyles.textTheme.headlineMedium,
           ),
         ),
-        backgroundColor: HexColor('f1efde'),
+        backgroundColor: AppColors.primaryColor,
       ),
       drawer: const CustomDrawer(),
       body: BlocBuilder<OrderBloc, OrderState>(
         builder: (context, state) {
           if (state is OrderLoading) {
             return Center(
-                child: CircularProgressIndicator(color: HexColor('f1efde')));
+                child:
+                    CircularProgressIndicator(color: AppColors.primaryColor));
           } else if (state is CartLoaded) {
             if (state.cartItems.items.isEmpty &&
                 state.outOfStockItems.isEmpty) {
@@ -248,28 +178,6 @@ class _CartScreenState extends State<CartScreen> {
                       ],
                     ),
                   ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text('To $_deliveryAddress'),
-                          ),
-                          TextButton(
-                            onPressed: _selectNewAddress,
-                            child: Text(
-                              'Change',
-                              style: TextStyle(color: HexColor('dad5a8')),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
               ],
             );
           } else if (state is OrderError) {
@@ -282,10 +190,10 @@ class _CartScreenState extends State<CartScreen> {
       bottomNavigationBar: BlocBuilder<OrderBloc, OrderState>(
         builder: (context, state) {
           if (state is CartLoaded && state.cartItems.items.isNotEmpty) {
-            final totalPrice = state.cartItems.total + _deliveryFee;
+            final totalPrice = state.cartItems.total;
             return BottomAppBar(
               height: MediaQuery.sizeOf(context).height * 0.11,
-              color: HexColor('f1efde'),
+              color: AppColors.primaryColor,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -296,7 +204,10 @@ class _CartScreenState extends State<CartScreen> {
                   Column(
                     children: [
                       TextButton(
-                        onPressed: _handleCheckout,
+                        onPressed: () async {
+                          final totalPrice = state.cartItems.total;
+                          await _handleCheckout(totalPrice);
+                        },
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.white,
                           backgroundColor:
@@ -307,12 +218,6 @@ class _CartScreenState extends State<CartScreen> {
                         child: Text(
                           'CheckOut',
                           style: AppTextStyles.textTheme.labelLarge,
-                        ),
-                      ),
-                      Flexible(
-                        child: Text(
-                          '+${_deliveryFee.toStringAsFixed(2)} delivery fees',
-                          style: AppTextStyles.textTheme.bodyMedium,
                         ),
                       ),
                     ],

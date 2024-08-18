@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:market/app/theme/colors.dart';
 
 class SignUpUserDetailsPage extends StatelessWidget {
   final TextEditingController userNameController;
@@ -15,7 +16,7 @@ class SignUpUserDetailsPage extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: HexColor('f1efde'), width: 2),
+        border: Border.all(color: AppColors.primaryColor, width: 2),
         borderRadius: BorderRadius.circular(15),
       ),
       child: Padding(
@@ -24,7 +25,7 @@ class SignUpUserDetailsPage extends StatelessWidget {
           children: [
             Container(
               decoration: BoxDecoration(
-                border: Border.all(color: HexColor('f1efde'), width: 2),
+                border: Border.all(color: AppColors.primaryColor, width: 2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: TextField(
@@ -40,11 +41,11 @@ class SignUpUserDetailsPage extends StatelessWidget {
             const SizedBox(height: 16.0),
             Container(
               decoration: BoxDecoration(
-                border: Border.all(color: HexColor('f1efde'), width: 2),
+                border: Border.all(color: AppColors.primaryColor, width: 2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: TextField(
-                cursorColor: HexColor('f1efde'),
+                cursorColor: AppColors.primaryColor,
                 textAlign: TextAlign.center,
                 controller: phoneNumberController,
                 decoration: const InputDecoration(

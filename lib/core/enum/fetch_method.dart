@@ -1,0 +1,6 @@
+
+
+enum FetchMethod {
+  byCategory,
+  byCollection,
+}

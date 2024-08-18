@@ -11,8 +11,6 @@ class OrderService {
   Future<void> addOrder(OrderList orderList, String userId) async {
     try {
       await _firestore
-          .collection('users')
-          .doc(userId)
           .collection('orders')
           .add(orderList.toMap());
       print('Order added successfully for user $userId');
@@ -43,7 +41,7 @@ class OrderService {
           _firestore.collection('users').doc(userId).collection('cart');
       WriteBatch batch = _firestore.batch();
       for (var item in cartData) {
-        DocumentReference itemRef = cartRef.doc(); // Auto ID for each item
+        DocumentReference itemRef = cartRef.doc(); 
         batch.set(itemRef, item);
       }
       await batch.commit();
@@ -132,4 +130,23 @@ Future<bool> getAvailability(String productId) async {
 
     await batch.commit();
   }
+  Future<String> getUserPhoneNumber(String userId) async {
+    try {
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      return userDoc.data()?['phoneNumber'] ?? 'Not Available';
+    } catch (e) {
+      throw Exception('Failed to fetch user phone number: ${e.toString()}');
+    }
+  }
+
+  Future<String> getUserName(String userId) async {
+    try {
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      return userDoc.data()?['userName'] ?? 'Guest';
+    } catch (e) {
+      throw Exception('Failed to fetch user name: ${e.toString()}');
+    }
+  }
+  
 }
+

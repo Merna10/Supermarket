@@ -1,5 +1,3 @@
-
-// lib/bloc/auth_state.dart
 part of 'auth_bloc.dart';
 
 abstract class AuthState extends Equatable {
@@ -13,7 +11,16 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
-class AuthAuthenticated extends AuthState {}
+class AuthAuthenticated extends AuthState {
+  final String role; 
+
+  const AuthAuthenticated({required this.role});
+
+  @override
+  List<Object> get props => [role];
+}
+
+
 
 class AuthUnauthenticated extends AuthState {}
 
@@ -25,3 +32,5 @@ class AuthError extends AuthState {
   @override
   List<Object> get props => [error];
 }
+
+

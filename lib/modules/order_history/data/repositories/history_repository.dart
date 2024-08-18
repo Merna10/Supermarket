@@ -7,7 +7,18 @@ class HistoryRepository {
   HistoryRepository({HistoryService? historyService})
       : _historyService = historyService ?? HistoryService();
 
-  Future<List<OrderList>> fetchOrders() {
-    return _historyService.fetchOrders();
+  Stream<List<OrderList>> fetchOrders({String status = 'All'}) {
+    return _historyService.fetchOrders(status: status);
+  }
+
+  Stream<List<OrderList>> fetchUserOrders(
+      {required String userId, String status = 'All'}) {
+    return _historyService.fetchUserOrders(userId: userId, status: status);
+  }
+
+  Future<void> updateOrderStatus(
+      {required String orderId, required String newStatus}) async {
+    return _historyService.updateOrderStatus(
+        orderId: orderId, newStatus: newStatus);
   }
 }

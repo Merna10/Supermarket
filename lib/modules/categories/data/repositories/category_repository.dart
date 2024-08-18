@@ -10,4 +10,26 @@ class CategoryRepository {
   Future<List<Category>> fetchCategories() {
     return _categoryService.fetchCategories();
   }
+
+  Future<void> addCategory(Category category) async {
+    return _categoryService.addCategory(category);
+  }
+
+  Future<void> deleteCategory(Category category) async {
+    try {
+      return _categoryService.deleteCategory(category);
+    } catch (e) {
+      print('Failed to delete category: $e');
+      throw Exception('Failed to delete categories: $e');
+    }
+  }
+
+  Future<String> fetchCategoryName(String categoryID) async {
+    try {
+      return _categoryService.fetchCategoryName(categoryID);
+    } catch (e) {
+      print('Failed to get category: $e');
+      throw Exception('Failed to get categories: $e');
+    }
+  }
 }

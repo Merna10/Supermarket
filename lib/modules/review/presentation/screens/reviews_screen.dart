@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hexcolor/hexcolor.dart';
+import 'package:market/app/theme/colors.dart';
 import 'package:market/modules/review/logic/bloc/review_bloc.dart';
 import 'package:market/modules/review/data/model/review.dart';
 
@@ -47,7 +47,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
           );
           BlocProvider.of<ReviewBloc>(context).add(AddReviewEvent(review));
           _commentController.clear();
-          Navigator.pop(context); // Close the BottomSheet after submission
+          Navigator.pop(context); 
         }
       } catch (e) {
         print('Error fetching user data: $e');
@@ -175,7 +175,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: HexColor('f1efde'),
+        backgroundColor: AppColors.primaryColor,
         onPressed: _showReviewBottomSheet,
         child: const Icon(
           Icons.add,

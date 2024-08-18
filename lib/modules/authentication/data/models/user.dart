@@ -5,12 +5,16 @@ class Users {
   final String email;
   final String userName;
   final String phoneNumber;
+  
+  final String role;
 
   Users({
     required this.id,
     required this.email,
     required this.userName,
     required this.phoneNumber,
+    
+    required this.role,
   });
 
   factory Users.fromFirestore(DocumentSnapshot doc) {
@@ -20,6 +24,8 @@ class Users {
       email: data['email'] ?? '',
       userName: data['userName'] ?? '',
       phoneNumber: data['phoneNumber'] ?? '',
+      
+      role: data['role'] ?? '',
     );
   }
 
@@ -29,6 +35,8 @@ class Users {
       'email': email,
       'userName': userName,
       'phoneNumber': phoneNumber,
+      
+      'role': role,
     };
   }
 }

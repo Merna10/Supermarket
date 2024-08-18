@@ -13,13 +13,51 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
       : _categoryRepository = categoryRepository,
         super(CategoryInitial()) {
     on<FetchCategories>(_onFetchCategories);
+    on<AddCategoryItem>(_onAddCategory);
+    on<RemoveCategoryItem>(_onDeleteCategory);
+    on<FetchCategoryName>(_onFetchCategoryName);
   }
 
-  void _onFetchCategories(FetchCategories event, Emitter<CategoryState> emit) async {
+  void _onFetchCategories(
+      FetchCategories event, Emitter<CategoryState> emit) async {
     emit(CategoryLoading());
     try {
       final categories = await _categoryRepository.fetchCategories();
       emit(CategoryLoaded(categories: categories));
+    } catch (e) {
+      emit(CategoryError(error: e.toString()));
+    }
+  }
+
+ void _onFetchCategoryName(
+    FetchCategoryName event, Emitter<CategoryState> emit) async {
+  emit(CategoryLoading());
+  try {
+    final categoryName = await _categoryRepository.fetchCategoryName(event.categoryId);
+    emit(CategoryNameLoaded(categoryName: categoryName));
+  } catch (e) {
+    emit(CategoryError(error: e.toString()));
+  }
+}
+
+
+  void _onAddCategory(
+      AddCategoryItem event, Emitter<CategoryState> emit) async {
+    emit(CategoryLoading());
+    try {
+      await _categoryRepository.addCategory(event.category);
+      add(FetchCategories());
+    } catch (e) {
+      emit(CategoryError(error: e.toString()));
+    }
+  }
+
+  void _onDeleteCategory(
+      RemoveCategoryItem event, Emitter<CategoryState> emit) async {
+    emit(CategoryLoading());
+    try {
+      await _categoryRepository.deleteCategory(event.category);
+      add(FetchCategories());
     } catch (e) {
       emit(CategoryError(error: e.toString()));
     }

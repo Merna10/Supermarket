@@ -34,7 +34,7 @@ class OrderRepository {
     return _orderService.updateItemQuantityInCart(item, quantity, userId);
   }
 
-  Future<int> getProductQuantity(String productId)  async {
+  Future<int> getProductQuantity(String productId) async {
     return _orderService.getProductQuantity(productId);
   }
 
@@ -44,15 +44,31 @@ class OrderRepository {
 
   Future<void> updateProductQuantity(
       String productId, int newQuantity, String userId) async {
-    return _orderService.updateProductQuantity(productId, newQuantity,);
+    return _orderService.updateProductQuantity(
+      productId,
+      newQuantity,
+    );
   }
 
-   Future<void> updateProductAvailability(
-      String productId,) async {
-    return _orderService.updateProductAvailability(productId,  );
+  Future<void> updateProductAvailability(
+    String productId,
+  ) async {
+    return _orderService.updateProductAvailability(
+      productId,
+    );
   }
 
   Future<void> clearCart(String userId) async {
     return _orderService.clearCart(userId);
   }
+
+  Future<String> getUserPhoneNumber(String userId) async {
+    return _orderService.getUserPhoneNumber(userId);
+  }
+
+  Future<String> getUserName(String userId) async {
+    return _orderService.getUserName(userId);
+  }
+
+  
 }

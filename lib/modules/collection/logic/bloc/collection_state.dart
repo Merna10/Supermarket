@@ -1,26 +1,42 @@
 part of 'collection_bloc.dart';
 
-sealed class CollectionState extends Equatable {
+abstract class CollectionState extends Equatable {
   const CollectionState();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
-final class CollectionInitial extends CollectionState {}
+class CollectionInitial extends CollectionState {}
 
 class CollectionLoading extends CollectionState {}
 
-class CollectionLoaded extends CollectionState {
+class CollectionLoadedState extends CollectionState {
   final List<Collection> collections;
-  const CollectionLoaded({required this.collections});
+
+  const CollectionLoadedState({required this.collections});
+
   @override
-  List<Object> get props => [collections];
+  List<Object?> get props => [collections];
 }
 
-class CollectionError extends CollectionState {
-   final String error;
-  const CollectionError({required this.error});
+class CollectionNameLoaded extends CollectionState {
+  final String collectionName;
+
+  const CollectionNameLoaded({required this.collectionName});
+
   @override
-  List<Object> get props => [error];
+  List<Object> get props => [collectionName];
 }
+
+
+
+class CollectionErrorState extends CollectionState {
+  final String error;
+
+  const CollectionErrorState({required this.error});
+
+  @override
+  List<Object?> get props => [error];
+}
+
